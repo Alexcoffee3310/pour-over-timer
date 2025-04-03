@@ -55,20 +55,55 @@ const TimerControls: React.FC<TimerControlsProps> = ({
     }));
   };
 
-  return (
-    <div className="flex flex-col gap-4 w-full max-w-md">
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid grid-cols-3 mb-2">
+  // Group tabs to show at most 3 per row for better UI
+  const renderTabsList = () => {
+    const numberOfSections = sections.length;
+    
+    if (numberOfSections <= 3) {
+      // For 1-3 sections, use a single row
+      return (
+        <TabsList className={`grid grid-cols-${numberOfSections} mb-2 w-full`}>
           {sections.map((section, index) => (
             <TabsTrigger 
               key={index} 
               value={index.toString()} 
-              className="text-xs sm:text-sm"
+              className="text-xs sm:text-sm flex items-center"
             >
               {section.name}
+              {section.type === 'sit' && (
+                <span className="ml-1 w-2 h-2 bg-amber-500 rounded-full"></span>
+              )}
             </TabsTrigger>
           ))}
         </TabsList>
+      );
+    } else {
+      // For more than 3 sections, create a scrollable row
+      return (
+        <div className="overflow-x-auto mb-2 pb-2">
+          <TabsList className="inline-flex min-w-full">
+            {sections.map((section, index) => (
+              <TabsTrigger 
+                key={index} 
+                value={index.toString()} 
+                className="text-xs sm:text-sm whitespace-nowrap flex items-center"
+              >
+                {section.name}
+                {section.type === 'sit' && (
+                  <span className="ml-1 w-2 h-2 bg-amber-500 rounded-full"></span>
+                )}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </div>
+      );
+    }
+  };
+
+  return (
+    <div className="flex flex-col gap-4 w-full max-w-md">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        {renderTabsList()}
         
         {sections.map((section, index) => (
           <TabsContent key={index} value={index.toString()} className="space-y-4">
@@ -116,6 +151,14 @@ const TimerControls: React.FC<TimerControlsProps> = ({
                 <Clock className="w-4 h-4 mr-2" />
                 Set
               </Button>
+            </div>
+
+            <div className="text-sm text-timer-text/70">
+              {section.type === 'sit' ? (
+                <p>This is a waiting period after the {sections[index-1]?.name || 'previous step'}.</p>
+              ) : (
+                <p>Set the time for the {section.name} stage.</p>
+              )}
             </div>
           </TabsContent>
         ))}

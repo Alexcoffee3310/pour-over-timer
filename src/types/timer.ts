@@ -2,6 +2,7 @@
 export interface TimerSection {
   name: string;
   timeInSeconds: number;
+  type?: 'pour' | 'sit';
 }
 
 export interface TimerState {

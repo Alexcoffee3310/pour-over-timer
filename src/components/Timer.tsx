@@ -13,9 +13,11 @@ interface TimerProps {
 const Timer: React.FC<TimerProps> = ({ initialTimeInSeconds = 60 }) => {
   const [timerState, setTimerState] = useState<TimerState>({
     sections: [
-      { name: 'Bloom', timeInSeconds: 30 },
-      { name: '1st Pour', timeInSeconds: 60 },
-      { name: '2nd Pour', timeInSeconds: 90 }
+      { name: 'Bloom', timeInSeconds: 30, type: 'pour' },
+      { name: 'Bloom Sit', timeInSeconds: 45, type: 'sit' },
+      { name: '1st Pour', timeInSeconds: 60, type: 'pour' },
+      { name: '1st Pour Sit', timeInSeconds: 45, type: 'sit' },
+      { name: '2nd Pour', timeInSeconds: 90, type: 'pour' }
     ],
     currentSectionIndex: 0,
     isRunning: false,
@@ -68,9 +70,10 @@ const Timer: React.FC<TimerProps> = ({ initialTimeInSeconds = 60 }) => {
               
               // Show notification for section completion
               const currentSection = timerState.sections[timerState.currentSectionIndex];
+              const nextSection = timerState.sections[nextSectionIndex];
               toast({
                 title: `${currentSection.name} completed!`,
-                description: `Moving to ${timerState.sections[nextSectionIndex].name}`,
+                description: `Moving to ${nextSection.name}`,
                 duration: 3000,
               });
               
@@ -184,6 +187,11 @@ const Timer: React.FC<TimerProps> = ({ initialTimeInSeconds = 60 }) => {
           <div className="text-center">
             <div className="text-sm font-medium text-timer-text/70 mb-1">
               {currentSection.name}
+              {currentSection.type === 'sit' && (
+                <span className="ml-1 inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-amber-100 text-amber-800">
+                  Wait
+                </span>
+              )}
             </div>
             <div className="text-4xl font-bold text-timer-text mb-1">
               {formatTime(timeRemaining)}
@@ -192,7 +200,7 @@ const Timer: React.FC<TimerProps> = ({ initialTimeInSeconds = 60 }) => {
               {timerState.isRunning ? 'Counting down...' : timerState.isCompleted ? 'Completed!' : 'Ready'}
             </div>
             <div className="text-xs text-timer-text/70 mt-1">
-              Section {timerState.currentSectionIndex + 1} of {timerState.sections.length}
+              Step {timerState.currentSectionIndex + 1} of {timerState.sections.length}
             </div>
           </div>
         </div>
