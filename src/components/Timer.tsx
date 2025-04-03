@@ -1,10 +1,10 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { useToast } from '@/components/ui/use-toast';
 import { Save } from 'lucide-react';
 import CircularProgress from './CircularProgress';
 import TimerControls from './TimerControls';
 import RecipeSelector from './RecipeSelector';
+import TimerStagesTable from './TimerStagesTable';
 import { Button } from '@/components/ui/button';
 import { formatTime } from '@/utils/time-formatter';
 import { TimerSection, TimerState, Recipe } from '@/types/timer';
@@ -13,7 +13,6 @@ interface TimerProps {
   initialTimeInSeconds?: number;
 }
 
-// Predefined recipes
 const DEFAULT_RECIPES: Recipe[] = [
   {
     id: 'recipe-a',
@@ -56,7 +55,6 @@ const DEFAULT_RECIPES: Recipe[] = [
   },
 ];
 
-// Get saved recipes from localStorage
 const getSavedRecipes = (): Recipe[] => {
   try {
     const savedRecipes = localStorage.getItem('customRecipes');
@@ -68,7 +66,6 @@ const getSavedRecipes = (): Recipe[] => {
 };
 
 const Timer: React.FC<TimerProps> = ({ initialTimeInSeconds = 60 }) => {
-  // Combine default recipes with any saved custom recipes
   const [recipes, setRecipes] = useState<Recipe[]>([
     ...DEFAULT_RECIPES,
     ...getSavedRecipes()
@@ -177,7 +174,6 @@ const Timer: React.FC<TimerProps> = ({ initialTimeInSeconds = 60 }) => {
   }, [timerState.isRunning, timerState.currentSectionIndex, timerState.sections, toast]);
   
   const handleSelectRecipe = (recipeId: string) => {
-    // Only allow recipe change when timer is not running
     if (!timerState.isRunning) {
       const selectedRecipe = recipes.find(recipe => recipe.id === recipeId);
       if (selectedRecipe) {
@@ -258,7 +254,6 @@ const Timer: React.FC<TimerProps> = ({ initialTimeInSeconds = 60 }) => {
   };
 
   const handleSaveRecipe = () => {
-    // Check if timer is running
     if (timerState.isRunning) {
       toast({
         title: "Cannot save recipe",
@@ -269,10 +264,8 @@ const Timer: React.FC<TimerProps> = ({ initialTimeInSeconds = 60 }) => {
     }
 
     try {
-      // Get existing custom recipes
       const existingCustomRecipes = getSavedRecipes();
       
-      // Generate next recipe letter (D, E, F, etc.)
       const nextRecipeLetter = String.fromCharCode(
         'D'.charCodeAt(0) + existingCustomRecipes.length
       );
@@ -281,7 +274,6 @@ const Timer: React.FC<TimerProps> = ({ initialTimeInSeconds = 60 }) => {
         (sum, section) => sum + section.timeInSeconds, 0
       );
       
-      // Create new recipe
       const newRecipe: Recipe = {
         id: `recipe-${nextRecipeLetter.toLowerCase()}`,
         name: `Recipe ${nextRecipeLetter} - Custom (${totalSeconds}s)`,
@@ -290,16 +282,12 @@ const Timer: React.FC<TimerProps> = ({ initialTimeInSeconds = 60 }) => {
         isCustom: true
       };
       
-      // Add new recipe to existing ones
       const updatedCustomRecipes = [...existingCustomRecipes, newRecipe];
       
-      // Save to localStorage
       localStorage.setItem('customRecipes', JSON.stringify(updatedCustomRecipes));
       
-      // Update recipes state
       setRecipes([...DEFAULT_RECIPES, ...updatedCustomRecipes]);
       
-      // Select the newly created recipe
       setSelectedRecipeId(newRecipe.id);
       
       toast({
@@ -322,12 +310,10 @@ const Timer: React.FC<TimerProps> = ({ initialTimeInSeconds = 60 }) => {
     ? (currentSection.timeInSeconds - timeRemaining) / currentSection.timeInSeconds 
     : 0;
   
-  // Check if current recipe is custom or has been modified
   const isCurrentRecipeModified = () => {
     const originalRecipe = recipes.find(r => r.id === selectedRecipeId);
     if (!originalRecipe) return true;
     
-    // Compare sections
     if (originalRecipe.sections.length !== timerState.sections.length) return true;
     
     return timerState.sections.some((section, index) => 
@@ -338,65 +324,71 @@ const Timer: React.FC<TimerProps> = ({ initialTimeInSeconds = 60 }) => {
   const showSaveButton = isCurrentRecipeModified() && !timerState.isRunning;
 
   return (
-    <div className="flex flex-col items-center gap-6">
+    <div className="flex flex-col items-center gap-4">
       <RecipeSelector
         recipes={recipes}
         selectedRecipeId={selectedRecipeId}
         onSelectRecipe={handleSelectRecipe}
       />
       
-      <div className="relative">
-        <CircularProgress 
-          progress={progress} 
-          size={280} 
-          strokeWidth={16} 
-          isCompleted={timerState.isCompleted}
-        />
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="text-center">
-            <div className="text-sm font-medium text-timer-text/70 mb-1">
-              {currentSection.name}
-              {currentSection.type === 'sit' && (
-                <span className="ml-1 inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-amber-100 text-amber-800">
-                  Wait
-                </span>
-              )}
+      <div className="flex flex-col md:flex-row gap-4 w-full">
+        <div className="flex-1">
+          <TimerStagesTable 
+            sections={timerState.sections}
+            currentSectionIndex={timerState.currentSectionIndex}
+            isRunning={timerState.isRunning}
+          />
+          
+          {showSaveButton && (
+            <Button 
+              onClick={handleSaveRecipe}
+              className="bg-green-600 hover:bg-green-700 text-white mb-2"
+              size="sm"
+            >
+              <Save className="w-4 h-4 mr-2" />
+              Save Custom Recipe
+            </Button>
+          )}
+        </div>
+        
+        <div className="flex-1 flex flex-col items-center">
+          <div className="relative mb-4">
+            <CircularProgress 
+              progress={progress} 
+              size={200} 
+              strokeWidth={12} 
+              isCompleted={timerState.isCompleted}
+            />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="text-center">
+                <div className="text-sm font-medium text-timer-text/70 mb-1">
+                  {currentSection.name}
+                </div>
+                <div className="text-3xl font-bold text-timer-text mb-1">
+                  {formatTime(timeRemaining)}
+                </div>
+                <div className="text-xs text-timer-text/70">
+                  {timerState.isRunning ? 'Counting down...' : timerState.isCompleted ? 'Completed!' : 'Ready'}
+                </div>
+                <div className="text-xs text-timer-text/70 mt-1">
+                  Total: {formatTime(timerState.totalTimeInSeconds || 0)}
+                </div>
+              </div>
             </div>
-            <div className="text-4xl font-bold text-timer-text mb-1">
-              {formatTime(timeRemaining)}
-            </div>
-            <div className="text-xs text-timer-text/70">
-              {timerState.isRunning ? 'Counting down...' : timerState.isCompleted ? 'Completed!' : 'Ready'}
-            </div>
-            <div className="text-xs text-timer-text/70 mt-1">
-              Step {timerState.currentSectionIndex + 1} of {timerState.sections.length}
-            </div>
-            <div className="text-xs text-timer-text/70 mt-1">
-              Total brew time: {formatTime(timerState.totalTimeInSeconds || 0)}
-            </div>
+          </div>
+          
+          <div className="w-full">
+            <TimerControls
+              sections={timerState.sections}
+              isRunning={timerState.isRunning}
+              onStart={handleStart}
+              onPause={handlePause}
+              onReset={handleReset}
+              onSetTime={handleSetTime}
+            />
           </div>
         </div>
       </div>
-      
-      {showSaveButton && (
-        <Button 
-          onClick={handleSaveRecipe}
-          className="bg-green-600 hover:bg-green-700 text-white mb-2"
-          size="sm"
-        >
-          <Save className="w-4 h-4 mr-2" />
-          Save Custom Recipe
-        </Button>
-      )}
-      
-      <TimerControls
-        sections={timerState.sections}
-        isRunning={timerState.isRunning}
-        onStart={handleStart}
-        onPause={handlePause}
-        onReset={handleReset}
-        onSetTime={handleSetTime}
-      />
     </div>
   );
 };

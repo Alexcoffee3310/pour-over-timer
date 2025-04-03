@@ -5,7 +5,6 @@ import { Input } from '@/components/ui/input';
 import { Clock, Play, Pause, RotateCcw } from 'lucide-react';
 import { toSeconds } from '@/utils/time-formatter';
 import { TimerSection } from '@/types/timer';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface TimerControlsProps {
   sections: TimerSection[];
@@ -24,20 +23,17 @@ const TimerControls: React.FC<TimerControlsProps> = ({
   onReset,
   onSetTime
 }) => {
-  const [activeTab, setActiveTab] = useState<string>("0");
-  const [timeInputs, setTimeInputs] = useState<{ [key: number]: { minutes: string; seconds: string } }>(
-    sections.reduce((acc, _, index) => {
-      acc[index] = { minutes: '0', seconds: '0' };
-      return acc;
-    }, {} as { [key: number]: { minutes: string; seconds: string } })
-  );
+  const [sectionIndex, setSectionIndex] = useState<number>(0);
+  const [timeInput, setTimeInput] = useState<{ minutes: string, seconds: string }>({
+    minutes: '0',
+    seconds: '0'
+  });
 
-  const handleSetTime = (sectionIndex: number) => {
-    const input = timeInputs[sectionIndex];
+  const handleSetTime = () => {
     const totalSeconds = toSeconds(
       0,
-      parseInt(input.minutes) || 0,
-      parseInt(input.seconds) || 0
+      parseInt(timeInput.minutes) || 0,
+      parseInt(timeInput.seconds) || 0
     );
     
     if (totalSeconds > 0) {
@@ -45,119 +41,68 @@ const TimerControls: React.FC<TimerControlsProps> = ({
     }
   };
 
-  const handleTimeInputChange = (sectionIndex: number, field: 'minutes' | 'seconds', value: string) => {
-    setTimeInputs(prev => ({
+  const handleTimeInputChange = (field: 'minutes' | 'seconds', value: string) => {
+    setTimeInput(prev => ({
       ...prev,
-      [sectionIndex]: {
-        ...prev[sectionIndex],
-        [field]: value
-      }
+      [field]: value
     }));
   };
 
-  // Group tabs to show at most 3 per row for better UI
-  const renderTabsList = () => {
-    const numberOfSections = sections.length;
-    
-    if (numberOfSections <= 3) {
-      // For 1-3 sections, use a single row
-      return (
-        <TabsList className={`grid grid-cols-${numberOfSections} mb-2 w-full`}>
-          {sections.map((section, index) => (
-            <TabsTrigger 
-              key={index} 
-              value={index.toString()} 
-              className="text-xs sm:text-sm flex items-center"
-            >
-              {section.name}
-              {section.type === 'sit' && (
-                <span className="ml-1 w-2 h-2 bg-amber-500 rounded-full"></span>
-              )}
-            </TabsTrigger>
-          ))}
-        </TabsList>
-      );
-    } else {
-      // For more than 3 sections, create a scrollable row
-      return (
-        <div className="overflow-x-auto mb-2 pb-2">
-          <TabsList className="inline-flex min-w-full">
-            {sections.map((section, index) => (
-              <TabsTrigger 
-                key={index} 
-                value={index.toString()} 
-                className="text-xs sm:text-sm whitespace-nowrap flex items-center"
-              >
-                {section.name}
-                {section.type === 'sit' && (
-                  <span className="ml-1 w-2 h-2 bg-amber-500 rounded-full"></span>
-                )}
-              </TabsTrigger>
-            ))}
-          </TabsList>
-        </div>
-      );
-    }
+  const handleSectionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSectionIndex(Number(e.target.value));
   };
 
   return (
-    <div className="flex flex-col gap-4 w-full max-w-md">
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        {renderTabsList()}
+    <div className="flex flex-col gap-3 w-full">
+      <div className="flex items-center gap-2 mb-2">
+        <select 
+          className="flex-1 h-9 px-3 rounded-md border border-input bg-transparent text-sm"
+          value={sectionIndex}
+          onChange={handleSectionChange}
+        >
+          {sections.map((section, index) => (
+            <option key={index} value={index}>
+              {section.name}
+            </option>
+          ))}
+        </select>
         
-        {sections.map((section, index) => (
-          <TabsContent key={index} value={index.toString()} className="space-y-4">
-            <div className="flex items-center justify-between gap-2">
-              <div className="flex flex-col gap-1">
-                <label htmlFor={`minutes-${index}`} className="text-xs text-timer-text/70">Minutes</label>
-                <Input
-                  id={`minutes-${index}`}
-                  type="number"
-                  min="0"
-                  max="59"
-                  value={timeInputs[index].minutes}
-                  onChange={(e) => handleTimeInputChange(index, 'minutes', e.target.value)}
-                  className="w-full text-center"
-                />
-              </div>
-              <div className="flex flex-col gap-1">
-                <label htmlFor={`seconds-${index}`} className="text-xs text-timer-text/70">Seconds</label>
-                <Input
-                  id={`seconds-${index}`}
-                  type="number"
-                  min="0"
-                  max="59"
-                  value={timeInputs[index].seconds}
-                  onChange={(e) => handleTimeInputChange(index, 'seconds', e.target.value)}
-                  className="w-full text-center"
-                />
-              </div>
-              <Button 
-                onClick={() => handleSetTime(index)} 
-                className="mt-6 bg-timer-primary hover:bg-timer-primary/90"
-              >
-                <Clock className="w-4 h-4 mr-2" />
-                Set
-              </Button>
-            </div>
-
-            <div className="text-sm text-timer-text/70">
-              {section.type === 'sit' ? (
-                <p>This is a waiting period after the {sections[index-1]?.name || 'previous step'}.</p>
-              ) : (
-                <p>Set the time for the {section.name} stage.</p>
-              )}
-            </div>
-          </TabsContent>
-        ))}
-      </Tabs>
+        <div className="flex flex-1 gap-1">
+          <Input
+            type="number"
+            min="0"
+            max="59"
+            value={timeInput.minutes}
+            onChange={(e) => handleTimeInputChange('minutes', e.target.value)}
+            className="w-full text-center"
+            placeholder="Min"
+          />
+          <Input
+            type="number"
+            min="0"
+            max="59"
+            value={timeInput.seconds}
+            onChange={(e) => handleTimeInputChange('seconds', e.target.value)}
+            className="w-full text-center"
+            placeholder="Sec"
+          />
+        </div>
+        
+        <Button 
+          onClick={handleSetTime} 
+          size="sm"
+          className="bg-timer-primary hover:bg-timer-primary/90"
+        >
+          <Clock className="w-4 h-4" />
+          <span className="sr-only">Set Time</span>
+        </Button>
+      </div>
       
-      <div className="flex items-center justify-center gap-4 mt-2">
+      <div className="flex items-center justify-center gap-4">
         {isRunning ? (
           <Button 
             onClick={onPause} 
-            className="bg-amber-500 hover:bg-amber-600 text-white"
-            size="lg"
+            className="bg-amber-500 hover:bg-amber-600 text-white flex-1"
           >
             <Pause className="w-5 h-5 mr-2" />
             Pause
@@ -165,8 +110,7 @@ const TimerControls: React.FC<TimerControlsProps> = ({
         ) : (
           <Button 
             onClick={onStart} 
-            className="bg-timer-primary hover:bg-timer-primary/90 text-white"
-            size="lg"
+            className="bg-timer-primary hover:bg-timer-primary/90 text-white flex-1"
           >
             <Play className="w-5 h-5 mr-2" />
             Start
@@ -177,10 +121,9 @@ const TimerControls: React.FC<TimerControlsProps> = ({
           onClick={onReset} 
           variant="outline" 
           className="border-timer-muted/50 text-timer-text"
-          size="lg"
         >
-          <RotateCcw className="w-5 h-5 mr-2" />
-          Reset
+          <RotateCcw className="w-5 h-5" />
+          <span className="sr-only md:not-sr-only md:ml-2">Reset</span>
         </Button>
       </div>
     </div>
