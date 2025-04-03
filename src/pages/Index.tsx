@@ -6,7 +6,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-timer-background flex flex-col items-center justify-center p-4">
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-timer-text mb-2">Countdown Timer</h1>
+        <h1 className="text-3xl font-bold text-timer-text mb-2">Pour over timer</h1>
         <p className="text-timer-text/70">Set your timer and track the countdown with a visual progress indicator.</p>
       </div>
       
