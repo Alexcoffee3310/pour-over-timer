@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { useToast } from '@/components/ui/use-toast';
 import CircularProgress from './CircularProgress';
@@ -23,7 +22,7 @@ const Timer: React.FC<TimerProps> = ({ initialTimeInSeconds = 60 }) => {
     currentSectionIndex: 0,
     isRunning: false,
     isCompleted: false,
-    totalTimeInSeconds: 315 // Initial total (30 + 45 + 60 + 45 + 90 + 45)
+    totalTimeInSeconds: 315
   });
   
   const [timeRemaining, setTimeRemaining] = useState(timerState.sections[0].timeInSeconds);
@@ -32,7 +31,6 @@ const Timer: React.FC<TimerProps> = ({ initialTimeInSeconds = 60 }) => {
   const intervalRef = useRef<number | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   
-  // Calculate total brew time whenever sections change
   useEffect(() => {
     const total = timerState.sections.reduce((sum, section) => sum + section.timeInSeconds, 0);
     setTimerState(prev => ({
@@ -42,7 +40,6 @@ const Timer: React.FC<TimerProps> = ({ initialTimeInSeconds = 60 }) => {
   }, [timerState.sections]);
   
   useEffect(() => {
-    // Create an audio element for the timer completion sound
     audioRef.current = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3');
     
     return () => {
@@ -53,7 +50,6 @@ const Timer: React.FC<TimerProps> = ({ initialTimeInSeconds = 60 }) => {
   }, []);
 
   useEffect(() => {
-    // Reset time remaining when changing sections
     setTimeRemaining(timerState.sections[timerState.currentSectionIndex].timeInSeconds);
   }, [timerState.currentSectionIndex, timerState.sections]);
   
@@ -62,24 +58,20 @@ const Timer: React.FC<TimerProps> = ({ initialTimeInSeconds = 60 }) => {
       intervalRef.current = window.setInterval(() => {
         setTimeRemaining((prevTime) => {
           if (prevTime <= 1) {
-            // Section complete
             const nextSectionIndex = timerState.currentSectionIndex + 1;
             
             if (nextSectionIndex < timerState.sections.length) {
-              // Move to next section
               setTimerState(prev => ({
                 ...prev,
                 currentSectionIndex: nextSectionIndex
               }));
               
-              // Play sound for section completion
               if (audioRef.current) {
                 audioRef.current.play().catch(error => 
                   console.error("Audio playback failed:", error)
                 );
               }
               
-              // Show notification for section completion
               const currentSection = timerState.sections[timerState.currentSectionIndex];
               const nextSection = timerState.sections[nextSectionIndex];
               toast({
@@ -90,7 +82,6 @@ const Timer: React.FC<TimerProps> = ({ initialTimeInSeconds = 60 }) => {
               
               return timerState.sections[nextSectionIndex].timeInSeconds;
             } else {
-              // All sections complete
               clearInterval(intervalRef.current!);
               setTimerState(prev => ({
                 ...prev,
@@ -98,14 +89,12 @@ const Timer: React.FC<TimerProps> = ({ initialTimeInSeconds = 60 }) => {
                 isCompleted: true
               }));
               
-              // Play sound
               if (audioRef.current) {
                 audioRef.current.play().catch(error => 
                   console.error("Audio playback failed:", error)
                 );
               }
               
-              // Show notification
               toast({
                 title: "All sections completed!",
                 description: "Your pour over is ready.",
@@ -185,7 +174,6 @@ const Timer: React.FC<TimerProps> = ({ initialTimeInSeconds = 60 }) => {
     }
   };
   
-  // Calculate progress (0 to 1) for the current section
   const currentSection = timerState.sections[timerState.currentSectionIndex];
   const progress = currentSection.timeInSeconds > 0 
     ? (currentSection.timeInSeconds - timeRemaining) / currentSection.timeInSeconds 
