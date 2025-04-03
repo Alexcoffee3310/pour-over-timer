@@ -5,6 +5,13 @@ export interface TimerSection {
   type?: 'pour' | 'sit';
 }
 
+export interface Recipe {
+  id: string;
+  name: string;
+  description: string;
+  sections: TimerSection[];
+}
+
 export interface TimerState {
   sections: TimerSection[];
   currentSectionIndex: number;

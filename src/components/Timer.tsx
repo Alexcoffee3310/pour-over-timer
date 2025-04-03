@@ -1,28 +1,67 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { useToast } from '@/components/ui/use-toast';
 import CircularProgress from './CircularProgress';
 import TimerControls from './TimerControls';
+import RecipeSelector from './RecipeSelector';
 import { formatTime } from '@/utils/time-formatter';
-import { TimerSection, TimerState } from '@/types/timer';
+import { TimerSection, TimerState, Recipe } from '@/types/timer';
 
 interface TimerProps {
   initialTimeInSeconds?: number;
 }
 
-const Timer: React.FC<TimerProps> = ({ initialTimeInSeconds = 60 }) => {
-  const [timerState, setTimerState] = useState<TimerState>({
+// Predefined recipes
+const RECIPES: Recipe[] = [
+  {
+    id: 'recipe-a',
+    name: 'Recipe A - Quick (95s)',
+    description: 'A quick brew with shorter intervals between pours',
     sections: [
-      { name: 'Bloom', timeInSeconds: 30, type: 'pour' },
-      { name: 'Bloom Sit', timeInSeconds: 45, type: 'sit' },
-      { name: '1st Pour', timeInSeconds: 60, type: 'pour' },
-      { name: '1st Pour Sit', timeInSeconds: 45, type: 'sit' },
-      { name: '2nd Pour', timeInSeconds: 90, type: 'pour' },
-      { name: '2nd Pour Sit', timeInSeconds: 45, type: 'sit' }
-    ],
+      { name: 'Bloom', timeInSeconds: 45, type: 'pour' },
+      { name: 'Bloom Sit', timeInSeconds: 10, type: 'sit' },
+      { name: '1st Pour', timeInSeconds: 10, type: 'pour' },
+      { name: '1st Pour Sit', timeInSeconds: 10, type: 'sit' },
+      { name: '2nd Pour', timeInSeconds: 10, type: 'pour' },
+      { name: '2nd Pour Sit', timeInSeconds: 10, type: 'sit' }
+    ]
+  },
+  {
+    id: 'recipe-b',
+    name: 'Recipe B - Balanced (120s)',
+    description: 'A balanced brew with medium intervals',
+    sections: [
+      { name: 'Bloom', timeInSeconds: 45, type: 'pour' },
+      { name: 'Bloom Sit', timeInSeconds: 15, type: 'sit' },
+      { name: '1st Pour', timeInSeconds: 15, type: 'pour' },
+      { name: '1st Pour Sit', timeInSeconds: 15, type: 'sit' },
+      { name: '2nd Pour', timeInSeconds: 15, type: 'pour' },
+      { name: '2nd Pour Sit', timeInSeconds: 15, type: 'sit' }
+    ]
+  },
+  {
+    id: 'recipe-c',
+    name: 'Recipe C - Extended (145s)',
+    description: 'A longer brew with extended intervals for deeper extraction',
+    sections: [
+      { name: 'Bloom', timeInSeconds: 45, type: 'pour' },
+      { name: 'Bloom Sit', timeInSeconds: 20, type: 'sit' },
+      { name: '1st Pour', timeInSeconds: 20, type: 'pour' },
+      { name: '1st Pour Sit', timeInSeconds: 20, type: 'sit' },
+      { name: '2nd Pour', timeInSeconds: 20, type: 'pour' },
+      { name: '2nd Pour Sit', timeInSeconds: 20, type: 'sit' }
+    ]
+  },
+];
+
+const Timer: React.FC<TimerProps> = ({ initialTimeInSeconds = 60 }) => {
+  const [selectedRecipeId, setSelectedRecipeId] = useState<string>(RECIPES[0].id);
+  const [timerState, setTimerState] = useState<TimerState>({
+    sections: RECIPES[0].sections,
     currentSectionIndex: 0,
     isRunning: false,
     isCompleted: false,
-    totalTimeInSeconds: 315
+    totalTimeInSeconds: RECIPES[0].sections.reduce((sum, section) => sum + section.timeInSeconds, 0)
   });
   
   const [timeRemaining, setTimeRemaining] = useState(timerState.sections[0].timeInSeconds);
@@ -118,6 +157,31 @@ const Timer: React.FC<TimerProps> = ({ initialTimeInSeconds = 60 }) => {
     };
   }, [timerState.isRunning, timerState.currentSectionIndex, timerState.sections, toast]);
   
+  const handleSelectRecipe = (recipeId: string) => {
+    // Only allow recipe change when timer is not running
+    if (!timerState.isRunning) {
+      const selectedRecipe = RECIPES.find(recipe => recipe.id === recipeId);
+      if (selectedRecipe) {
+        setSelectedRecipeId(recipeId);
+        setTimerState({
+          sections: selectedRecipe.sections,
+          currentSectionIndex: 0,
+          isRunning: false,
+          isCompleted: false,
+          totalTimeInSeconds: selectedRecipe.sections.reduce(
+            (sum, section) => sum + section.timeInSeconds, 0
+          )
+        });
+      }
+    } else {
+      toast({
+        title: "Cannot change recipe",
+        description: "Please pause the timer before changing recipes",
+        variant: "destructive",
+      });
+    }
+  };
+  
   const handleStart = () => {
     if (timeRemaining > 0) {
       setTimerState(prev => ({
@@ -181,6 +245,12 @@ const Timer: React.FC<TimerProps> = ({ initialTimeInSeconds = 60 }) => {
   
   return (
     <div className="flex flex-col items-center gap-6">
+      <RecipeSelector
+        recipes={RECIPES}
+        selectedRecipeId={selectedRecipeId}
+        onSelectRecipe={handleSelectRecipe}
+      />
+      
       <div className="relative">
         <CircularProgress 
           progress={progress} 
