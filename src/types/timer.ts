@@ -10,4 +10,5 @@ export interface TimerState {
   currentSectionIndex: number;
   isRunning: boolean;
   isCompleted: boolean;
+  totalTimeInSeconds?: number;
 }

@@ -17,11 +17,13 @@ const Timer: React.FC<TimerProps> = ({ initialTimeInSeconds = 60 }) => {
       { name: 'Bloom Sit', timeInSeconds: 45, type: 'sit' },
       { name: '1st Pour', timeInSeconds: 60, type: 'pour' },
       { name: '1st Pour Sit', timeInSeconds: 45, type: 'sit' },
-      { name: '2nd Pour', timeInSeconds: 90, type: 'pour' }
+      { name: '2nd Pour', timeInSeconds: 90, type: 'pour' },
+      { name: '2nd Pour Sit', timeInSeconds: 45, type: 'sit' }
     ],
     currentSectionIndex: 0,
     isRunning: false,
-    isCompleted: false
+    isCompleted: false,
+    totalTimeInSeconds: 315 // Initial total (30 + 45 + 60 + 45 + 90 + 45)
   });
   
   const [timeRemaining, setTimeRemaining] = useState(timerState.sections[0].timeInSeconds);
@@ -29,6 +31,15 @@ const Timer: React.FC<TimerProps> = ({ initialTimeInSeconds = 60 }) => {
   
   const intervalRef = useRef<number | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  
+  // Calculate total brew time whenever sections change
+  useEffect(() => {
+    const total = timerState.sections.reduce((sum, section) => sum + section.timeInSeconds, 0);
+    setTimerState(prev => ({
+      ...prev,
+      totalTimeInSeconds: total
+    }));
+  }, [timerState.sections]);
   
   useEffect(() => {
     // Create an audio element for the timer completion sound
@@ -155,11 +166,17 @@ const Timer: React.FC<TimerProps> = ({ initialTimeInSeconds = 60 }) => {
         timeInSeconds: seconds
       };
       
+      const totalTime = updatedSections.reduce(
+        (sum, section) => sum + section.timeInSeconds,
+        0
+      );
+      
       return {
         ...prev,
         sections: updatedSections,
         isRunning: false,
-        isCompleted: false
+        isCompleted: false,
+        totalTimeInSeconds: totalTime
       };
     });
     
@@ -201,6 +218,9 @@ const Timer: React.FC<TimerProps> = ({ initialTimeInSeconds = 60 }) => {
             </div>
             <div className="text-xs text-timer-text/70 mt-1">
               Step {timerState.currentSectionIndex + 1} of {timerState.sections.length}
+            </div>
+            <div className="text-xs text-timer-text/70 mt-1">
+              Total brew time: {formatTime(timerState.totalTimeInSeconds || 0)}
             </div>
           </div>
         </div>

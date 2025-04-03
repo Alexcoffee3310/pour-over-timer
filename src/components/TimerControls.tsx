@@ -25,17 +25,17 @@ const TimerControls: React.FC<TimerControlsProps> = ({
   onSetTime
 }) => {
   const [activeTab, setActiveTab] = useState<string>("0");
-  const [timeInputs, setTimeInputs] = useState<{ [key: number]: { hours: string; minutes: string; seconds: string } }>(
+  const [timeInputs, setTimeInputs] = useState<{ [key: number]: { minutes: string; seconds: string } }>(
     sections.reduce((acc, _, index) => {
-      acc[index] = { hours: '0', minutes: '0', seconds: '0' };
+      acc[index] = { minutes: '0', seconds: '0' };
       return acc;
-    }, {} as { [key: number]: { hours: string; minutes: string; seconds: string } })
+    }, {} as { [key: number]: { minutes: string; seconds: string } })
   );
 
   const handleSetTime = (sectionIndex: number) => {
     const input = timeInputs[sectionIndex];
     const totalSeconds = toSeconds(
-      parseInt(input.hours) || 0,
+      0,
       parseInt(input.minutes) || 0,
       parseInt(input.seconds) || 0
     );
@@ -45,7 +45,7 @@ const TimerControls: React.FC<TimerControlsProps> = ({
     }
   };
 
-  const handleTimeInputChange = (sectionIndex: number, field: 'hours' | 'minutes' | 'seconds', value: string) => {
+  const handleTimeInputChange = (sectionIndex: number, field: 'minutes' | 'seconds', value: string) => {
     setTimeInputs(prev => ({
       ...prev,
       [sectionIndex]: {
@@ -108,18 +108,6 @@ const TimerControls: React.FC<TimerControlsProps> = ({
         {sections.map((section, index) => (
           <TabsContent key={index} value={index.toString()} className="space-y-4">
             <div className="flex items-center justify-between gap-2">
-              <div className="flex flex-col gap-1">
-                <label htmlFor={`hours-${index}`} className="text-xs text-timer-text/70">Hours</label>
-                <Input
-                  id={`hours-${index}`}
-                  type="number"
-                  min="0"
-                  max="99"
-                  value={timeInputs[index].hours}
-                  onChange={(e) => handleTimeInputChange(index, 'hours', e.target.value)}
-                  className="w-full text-center"
-                />
-              </div>
               <div className="flex flex-col gap-1">
                 <label htmlFor={`minutes-${index}`} className="text-xs text-timer-text/70">Minutes</label>
                 <Input
