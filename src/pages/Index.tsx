@@ -11,11 +11,11 @@ const Index = () => {
       </div>
       
       <div className="bg-white/50 backdrop-blur-sm p-8 rounded-xl shadow-lg max-w-lg w-full">
-        <Timer initialTimeInSeconds={300} />
+        <Timer />
       </div>
       
       <p className="text-sm text-timer-text/50 mt-6">
-        Customize the time and press Start to begin the countdown.
+        Customize the time for each section and press Start to begin the countdown.
       </p>
     </div>
   );

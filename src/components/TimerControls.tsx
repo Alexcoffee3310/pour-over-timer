@@ -4,82 +4,122 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Clock, Play, Pause, RotateCcw } from 'lucide-react';
 import { toSeconds } from '@/utils/time-formatter';
+import { TimerSection } from '@/types/timer';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface TimerControlsProps {
+  sections: TimerSection[];
   isRunning: boolean;
   onStart: () => void;
   onPause: () => void;
   onReset: () => void;
-  onSetTime: (seconds: number) => void;
+  onSetTime: (sectionIndex: number, seconds: number) => void;
 }
 
 const TimerControls: React.FC<TimerControlsProps> = ({
+  sections,
   isRunning,
   onStart,
   onPause,
   onReset,
   onSetTime
 }) => {
-  const [hours, setHours] = useState<string>('0');
-  const [minutes, setMinutes] = useState<string>('0');
-  const [seconds, setSeconds] = useState<string>('0');
+  const [activeTab, setActiveTab] = useState<string>("0");
+  const [timeInputs, setTimeInputs] = useState<{ [key: number]: { hours: string; minutes: string; seconds: string } }>(
+    sections.reduce((acc, _, index) => {
+      acc[index] = { hours: '0', minutes: '0', seconds: '0' };
+      return acc;
+    }, {} as { [key: number]: { hours: string; minutes: string; seconds: string } })
+  );
 
-  const handleSetTime = () => {
+  const handleSetTime = (sectionIndex: number) => {
+    const input = timeInputs[sectionIndex];
     const totalSeconds = toSeconds(
-      parseInt(hours) || 0,
-      parseInt(minutes) || 0,
-      parseInt(seconds) || 0
+      parseInt(input.hours) || 0,
+      parseInt(input.minutes) || 0,
+      parseInt(input.seconds) || 0
     );
     
     if (totalSeconds > 0) {
-      onSetTime(totalSeconds);
+      onSetTime(sectionIndex, totalSeconds);
     }
+  };
+
+  const handleTimeInputChange = (sectionIndex: number, field: 'hours' | 'minutes' | 'seconds', value: string) => {
+    setTimeInputs(prev => ({
+      ...prev,
+      [sectionIndex]: {
+        ...prev[sectionIndex],
+        [field]: value
+      }
+    }));
   };
 
   return (
     <div className="flex flex-col gap-4 w-full max-w-md">
-      <div className="flex items-center justify-between gap-2">
-        <div className="flex flex-col gap-1">
-          <label htmlFor="hours" className="text-xs text-timer-text/70">Hours</label>
-          <Input
-            id="hours"
-            type="number"
-            min="0"
-            max="99"
-            value={hours}
-            onChange={(e) => setHours(e.target.value)}
-            className="w-full text-center"
-          />
-        </div>
-        <div className="flex flex-col gap-1">
-          <label htmlFor="minutes" className="text-xs text-timer-text/70">Minutes</label>
-          <Input
-            id="minutes"
-            type="number"
-            min="0"
-            max="59"
-            value={minutes}
-            onChange={(e) => setMinutes(e.target.value)}
-            className="w-full text-center"
-          />
-        </div>
-        <div className="flex flex-col gap-1">
-          <label htmlFor="seconds" className="text-xs text-timer-text/70">Seconds</label>
-          <Input
-            id="seconds"
-            type="number"
-            min="0"
-            max="59"
-            value={seconds}
-            onChange={(e) => setSeconds(e.target.value)}
-            className="w-full text-center"
-          />
-        </div>
-        <Button onClick={handleSetTime} className="mt-6 bg-timer-primary hover:bg-timer-primary/90">
-          <Clock className="w-4 h-4 mr-2" />
-          Set
-        </Button>
-      </div>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="grid grid-cols-3 mb-2">
+          {sections.map((section, index) => (
+            <TabsTrigger 
+              key={index} 
+              value={index.toString()} 
+              className="text-xs sm:text-sm"
+            >
+              {section.name}
+            </TabsTrigger>
+          ))}
+        </TabsList>
+        
+        {sections.map((section, index) => (
+          <TabsContent key={index} value={index.toString()} className="space-y-4">
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex flex-col gap-1">
+                <label htmlFor={`hours-${index}`} className="text-xs text-timer-text/70">Hours</label>
+                <Input
+                  id={`hours-${index}`}
+                  type="number"
+                  min="0"
+                  max="99"
+                  value={timeInputs[index].hours}
+                  onChange={(e) => handleTimeInputChange(index, 'hours', e.target.value)}
+                  className="w-full text-center"
+                />
+              </div>
+              <div className="flex flex-col gap-1">
+                <label htmlFor={`minutes-${index}`} className="text-xs text-timer-text/70">Minutes</label>
+                <Input
+                  id={`minutes-${index}`}
+                  type="number"
+                  min="0"
+                  max="59"
+                  value={timeInputs[index].minutes}
+                  onChange={(e) => handleTimeInputChange(index, 'minutes', e.target.value)}
+                  className="w-full text-center"
+                />
+              </div>
+              <div className="flex flex-col gap-1">
+                <label htmlFor={`seconds-${index}`} className="text-xs text-timer-text/70">Seconds</label>
+                <Input
+                  id={`seconds-${index}`}
+                  type="number"
+                  min="0"
+                  max="59"
+                  value={timeInputs[index].seconds}
+                  onChange={(e) => handleTimeInputChange(index, 'seconds', e.target.value)}
+                  className="w-full text-center"
+                />
+              </div>
+              <Button 
+                onClick={() => handleSetTime(index)} 
+                className="mt-6 bg-timer-primary hover:bg-timer-primary/90"
+              >
+                <Clock className="w-4 h-4 mr-2" />
+                Set
+              </Button>
+            </div>
+          </TabsContent>
+        ))}
+      </Tabs>
       
       <div className="flex items-center justify-center gap-4 mt-2">
         {isRunning ? (
