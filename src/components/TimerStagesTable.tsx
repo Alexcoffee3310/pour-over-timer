@@ -15,6 +15,9 @@ const TimerStagesTable: React.FC<TimerStagesTableProps> = ({
   currentSectionIndex,
   isRunning,
 }) => {
+  // Calculate the total time of all sections
+  const totalTimeInSeconds = sections.reduce((sum, section) => sum + section.timeInSeconds, 0);
+  
   return (
     <div className="w-full overflow-hidden rounded-md border mb-4">
       <Table>
@@ -48,6 +51,13 @@ const TimerStagesTable: React.FC<TimerStagesTableProps> = ({
               </TableCell>
             </TableRow>
           ))}
+          
+          {/* Total row */}
+          <TableRow className="font-medium bg-gray-50">
+            <TableCell colSpan={2} className="text-right">Total</TableCell>
+            <TableCell className="text-right font-mono">{formatTime(totalTimeInSeconds)}</TableCell>
+            <TableCell></TableCell>
+          </TableRow>
         </TableBody>
       </Table>
     </div>
