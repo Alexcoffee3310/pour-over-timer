@@ -1,9 +1,11 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useToast } from '@/components/ui/use-toast';
+import { Save } from 'lucide-react';
 import CircularProgress from './CircularProgress';
 import TimerControls from './TimerControls';
 import RecipeSelector from './RecipeSelector';
+import { Button } from '@/components/ui/button';
 import { formatTime } from '@/utils/time-formatter';
 import { TimerSection, TimerState, Recipe } from '@/types/timer';
 
@@ -12,7 +14,7 @@ interface TimerProps {
 }
 
 // Predefined recipes
-const RECIPES: Recipe[] = [
+const DEFAULT_RECIPES: Recipe[] = [
   {
     id: 'recipe-a',
     name: 'Recipe A - Quick (95s)',
@@ -54,14 +56,31 @@ const RECIPES: Recipe[] = [
   },
 ];
 
+// Get saved recipes from localStorage
+const getSavedRecipes = (): Recipe[] => {
+  try {
+    const savedRecipes = localStorage.getItem('customRecipes');
+    return savedRecipes ? JSON.parse(savedRecipes) : [];
+  } catch (error) {
+    console.error('Error loading saved recipes:', error);
+    return [];
+  }
+};
+
 const Timer: React.FC<TimerProps> = ({ initialTimeInSeconds = 60 }) => {
-  const [selectedRecipeId, setSelectedRecipeId] = useState<string>(RECIPES[0].id);
+  // Combine default recipes with any saved custom recipes
+  const [recipes, setRecipes] = useState<Recipe[]>([
+    ...DEFAULT_RECIPES,
+    ...getSavedRecipes()
+  ]);
+  
+  const [selectedRecipeId, setSelectedRecipeId] = useState<string>(recipes[0].id);
   const [timerState, setTimerState] = useState<TimerState>({
-    sections: RECIPES[0].sections,
+    sections: recipes[0].sections,
     currentSectionIndex: 0,
     isRunning: false,
     isCompleted: false,
-    totalTimeInSeconds: RECIPES[0].sections.reduce((sum, section) => sum + section.timeInSeconds, 0)
+    totalTimeInSeconds: recipes[0].sections.reduce((sum, section) => sum + section.timeInSeconds, 0)
   });
   
   const [timeRemaining, setTimeRemaining] = useState(timerState.sections[0].timeInSeconds);
@@ -160,7 +179,7 @@ const Timer: React.FC<TimerProps> = ({ initialTimeInSeconds = 60 }) => {
   const handleSelectRecipe = (recipeId: string) => {
     // Only allow recipe change when timer is not running
     if (!timerState.isRunning) {
-      const selectedRecipe = RECIPES.find(recipe => recipe.id === recipeId);
+      const selectedRecipe = recipes.find(recipe => recipe.id === recipeId);
       if (selectedRecipe) {
         setSelectedRecipeId(recipeId);
         setTimerState({
@@ -237,16 +256,91 @@ const Timer: React.FC<TimerProps> = ({ initialTimeInSeconds = 60 }) => {
       setTimeRemaining(seconds);
     }
   };
+
+  const handleSaveRecipe = () => {
+    // Check if timer is running
+    if (timerState.isRunning) {
+      toast({
+        title: "Cannot save recipe",
+        description: "Please pause the timer before saving recipe",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      // Get existing custom recipes
+      const existingCustomRecipes = getSavedRecipes();
+      
+      // Generate next recipe letter (D, E, F, etc.)
+      const nextRecipeLetter = String.fromCharCode(
+        'D'.charCodeAt(0) + existingCustomRecipes.length
+      );
+      
+      const totalSeconds = timerState.sections.reduce(
+        (sum, section) => sum + section.timeInSeconds, 0
+      );
+      
+      // Create new recipe
+      const newRecipe: Recipe = {
+        id: `recipe-${nextRecipeLetter.toLowerCase()}`,
+        name: `Recipe ${nextRecipeLetter} - Custom (${totalSeconds}s)`,
+        description: 'Your custom pour over recipe',
+        sections: [...timerState.sections],
+        isCustom: true
+      };
+      
+      // Add new recipe to existing ones
+      const updatedCustomRecipes = [...existingCustomRecipes, newRecipe];
+      
+      // Save to localStorage
+      localStorage.setItem('customRecipes', JSON.stringify(updatedCustomRecipes));
+      
+      // Update recipes state
+      setRecipes([...DEFAULT_RECIPES, ...updatedCustomRecipes]);
+      
+      // Select the newly created recipe
+      setSelectedRecipeId(newRecipe.id);
+      
+      toast({
+        title: "Recipe saved!",
+        description: `Your custom recipe has been saved as ${newRecipe.name}`,
+        duration: 3000,
+      });
+    } catch (error) {
+      console.error('Error saving recipe:', error);
+      toast({
+        title: "Error saving recipe",
+        description: "An error occurred while saving your recipe",
+        variant: "destructive",
+      });
+    }
+  };
   
   const currentSection = timerState.sections[timerState.currentSectionIndex];
   const progress = currentSection.timeInSeconds > 0 
     ? (currentSection.timeInSeconds - timeRemaining) / currentSection.timeInSeconds 
     : 0;
   
+  // Check if current recipe is custom or has been modified
+  const isCurrentRecipeModified = () => {
+    const originalRecipe = recipes.find(r => r.id === selectedRecipeId);
+    if (!originalRecipe) return true;
+    
+    // Compare sections
+    if (originalRecipe.sections.length !== timerState.sections.length) return true;
+    
+    return timerState.sections.some((section, index) => 
+      section.timeInSeconds !== originalRecipe.sections[index].timeInSeconds
+    );
+  };
+  
+  const showSaveButton = isCurrentRecipeModified() && !timerState.isRunning;
+
   return (
     <div className="flex flex-col items-center gap-6">
       <RecipeSelector
-        recipes={RECIPES}
+        recipes={recipes}
         selectedRecipeId={selectedRecipeId}
         onSelectRecipe={handleSelectRecipe}
       />
@@ -283,6 +377,17 @@ const Timer: React.FC<TimerProps> = ({ initialTimeInSeconds = 60 }) => {
           </div>
         </div>
       </div>
+      
+      {showSaveButton && (
+        <Button 
+          onClick={handleSaveRecipe}
+          className="bg-green-600 hover:bg-green-700 text-white mb-2"
+          size="sm"
+        >
+          <Save className="w-4 h-4 mr-2" />
+          Save Custom Recipe
+        </Button>
+      )}
       
       <TimerControls
         sections={timerState.sections}
