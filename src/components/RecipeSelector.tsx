@@ -22,15 +22,15 @@ const RecipeSelector: React.FC<RecipeSelectorProps> = ({
   onSelectRecipe,
 }) => {
   return (
-    <div className="w-full max-w-md mb-2">
+    <div className="w-full max-w-md">
       <Select
         value={selectedRecipeId}
         onValueChange={onSelectRecipe}
       >
-        <SelectTrigger className="w-full bg-white/30 border-white/30 backdrop-blur-sm shadow-md rounded-lg transition-all duration-300 hover:bg-white/40">
+        <SelectTrigger className="w-full bg-white/10 backdrop-blur-sm shadow-sm rounded-lg transition-all duration-300 hover:bg-white/20">
           <SelectValue placeholder="Select a recipe" />
         </SelectTrigger>
-        <SelectContent className="bg-white/90 backdrop-blur-md border-white/30 rounded-lg shadow-lg">
+        <SelectContent className="bg-white/80 backdrop-blur-md rounded-lg shadow-lg">
           {recipes.map((recipe) => (
             <SelectItem key={recipe.id} value={recipe.id} className="focus:bg-timer-primary/10 transition-colors duration-200">
               <div className="flex items-center justify-between">

@@ -349,15 +349,15 @@ const Timer: React.FC<TimerProps> = ({ initialTimeInSeconds = 60 }) => {
   const showSaveButton = isCurrentRecipeModified() && !timerState.isRunning;
 
   return (
-    <div className="flex flex-col items-center gap-6">
+    <div className="flex flex-col items-center gap-4">
       <RecipeSelector
         recipes={recipes}
         selectedRecipeId={selectedRecipeId}
         onSelectRecipe={handleSelectRecipe}
       />
       
-      <div className="flex flex-col md:flex-row gap-8 w-full">
-        <div className="flex-1 bg-white/30 backdrop-blur-sm p-5 rounded-xl border border-white/40 shadow-md">
+      <div className="flex flex-col md:flex-row gap-4 w-full">
+        <div className="flex-1 bg-white/10 backdrop-blur-sm p-4 rounded-xl shadow-sm">
           <TimerStagesTable 
             sections={timerState.sections}
             currentSectionIndex={timerState.currentSectionIndex}
@@ -376,11 +376,11 @@ const Timer: React.FC<TimerProps> = ({ initialTimeInSeconds = 60 }) => {
           )}
         </div>
         
-        <div className="flex-1 flex flex-col items-center bg-white/20 backdrop-blur-sm p-6 rounded-xl border border-white/30 shadow-md">
-          <div className="relative mb-6">
+        <div className="flex-1 flex flex-col items-center bg-white/10 backdrop-blur-sm p-4 rounded-xl shadow-sm">
+          <div className="relative mb-4">
             <CircularProgress 
               progress={progress} 
-              size={220} 
+              size={200} 
               strokeWidth={12} 
               isCompleted={timerState.isCompleted}
             />
@@ -396,7 +396,7 @@ const Timer: React.FC<TimerProps> = ({ initialTimeInSeconds = 60 }) => {
                   {timerState.isRunning ? 'Brewing...' : timerState.isCompleted ? 'Completed' : 'Ready'}
                 </div>
                 {currentSection.pourAmount && currentSection.type === 'pour' && (
-                  <div className="text-sm text-timer-primary font-medium mt-2 bg-timer-primary/5 px-3 py-1 rounded-full border border-timer-primary/20 backdrop-blur-sm">
+                  <div className="text-sm text-timer-primary font-medium mt-2 bg-timer-primary/5 px-3 py-1 rounded-full backdrop-blur-sm">
                     {currentSection.pourAmount} ml
                   </div>
                 )}
