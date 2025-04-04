@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -50,12 +51,12 @@
 
     --sidebar-ring: 217.2 91.2% 59.8%;
 
-    /* Timer theme colors */
-    --timer-primary: 250 95% 64%;
-    --timer-secondary: 190 95% 39%;
-    --timer-background: 220 20% 97%;
-    --timer-text: 220 25% 20%;
-    --timer-muted: 220 10% 80%;
+    /* Timer theme colors - Modern Luxury Style */
+    --timer-primary: 267 59% 40%; /* Deep plum purple */
+    --timer-secondary: 200 13% 46%; /* Slate blue-gray */
+    --timer-background: 220 33% 99%; /* Soft white */
+    --timer-text: 246 22% 20%; /* Deep navy */
+    --timer-muted: 230 15% 76%; /* Soft gray */
   }
 
   .dark {
@@ -95,12 +96,12 @@
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
     
-    /* Timer theme colors dark mode */
-    --timer-primary: 250 70% 60%;
-    --timer-secondary: 190 70% 50%;
-    --timer-background: 220 20% 10%;
-    --timer-text: 220 15% 90%;
-    --timer-muted: 220 10% 40%;
+    /* Timer theme colors dark mode - Modern Luxury Style */
+    --timer-primary: 267 59% 60%; /* Brighter plum purple for dark mode */
+    --timer-secondary: 200 13% 56%; /* Lighter slate for dark mode */
+    --timer-background: 246 22% 12%; /* Deep navy background */
+    --timer-text: 220 15% 90%; /* Light text */
+    --timer-muted: 230 15% 36%; /* Deeper muted tone */
   }
 }
 
@@ -115,6 +116,7 @@
     padding: 0;
     overflow: hidden;
     max-height: 100vh;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
   }
 }
 
@@ -154,4 +156,17 @@
 
 ::-webkit-scrollbar-thumb:hover {
   background: var(--timer-text);
+}
+
+/* Modern Luxury Specific Styles */
+.luxury-glass {
+  @apply backdrop-blur-sm bg-white/40 border border-white/20 shadow-lg;
+}
+
+.luxury-card {
+  @apply bg-white/70 backdrop-blur-md border border-gray-100 shadow-xl rounded-xl;
+}
+
+.luxury-gradient {
+  background: linear-gradient(135deg, hsl(var(--timer-primary)/0.05) 0%, hsl(var(--timer-secondary)/0.1) 100%);
 }

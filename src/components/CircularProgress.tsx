@@ -16,11 +16,11 @@ interface CircularProgressProps {
 const CircularProgress: React.FC<CircularProgressProps> = ({
   progress,
   size = 200,
-  strokeWidth = 12,
+  strokeWidth = 10, // Thinner stroke for elegance
   showProgress = false,
   className,
   progressColor = 'stroke-timer-primary',
-  backgroundColor = 'stroke-timer-muted/30',
+  backgroundColor = 'stroke-timer-muted/20', // More subtle background
   isCompleted = false
 }) => {
   const normalizedProgress = Math.min(1, Math.max(0, progress));
@@ -37,7 +37,7 @@ const CircularProgress: React.FC<CircularProgressProps> = ({
         height={size} 
         viewBox={`0 0 ${size} ${size}`}
         className={cn(
-          "transform -rotate-90", 
+          "transform -rotate-90 drop-shadow-sm", 
           isCompleted && "timer-complete-animation"
         )}
       >
@@ -63,8 +63,19 @@ const CircularProgress: React.FC<CircularProgressProps> = ({
           strokeDashoffset={strokeDashoffset}
           className={cn(
             "transition-all duration-200 ease-linear",
-            progressColor
+            progressColor,
+            "filter drop-shadow-md" // Add subtle shadow for depth
           )}
+        />
+        
+        {/* Add subtle inner ring for luxury feel */}
+        <circle
+          cx={center}
+          cy={center}
+          r={radius - strokeWidth - 5}
+          strokeWidth={1}
+          fill="transparent"
+          className="stroke-timer-primary/10"
         />
       </svg>
       
