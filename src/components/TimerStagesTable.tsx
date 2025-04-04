@@ -32,7 +32,6 @@ const TimerStagesTable: React.FC<TimerStagesTableProps> = ({
             <TableHead className="font-medium text-timer-text/80 py-1">Stage</TableHead>
             <TableHead className="text-right font-medium text-timer-text/80 py-1">Duration</TableHead>
             <TableHead className="text-right font-medium text-timer-text/80 py-1">Pour (ml)</TableHead>
-            <TableHead className="w-20 text-center font-medium text-timer-text/80 py-1">Type</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -54,17 +53,6 @@ const TimerStagesTable: React.FC<TimerStagesTableProps> = ({
                   </div>
                 ) : '-'}
               </TableCell>
-              <TableCell className="text-center py-0.5">
-                {section.type === 'sit' ? (
-                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-amber-100/30 text-amber-800 backdrop-blur-sm">
-                    Wait
-                  </span>
-                ) : (
-                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-timer-primary/10 text-timer-primary backdrop-blur-sm">
-                    Pour
-                  </span>
-                )}
-              </TableCell>
             </TableRow>
           ))}
           
@@ -78,7 +66,6 @@ const TimerStagesTable: React.FC<TimerStagesTableProps> = ({
                 {totalPourAmount > 0 && <Droplets className="h-3 w-3 text-timer-primary" />}
               </div>
             </TableCell>
-            <TableCell className="py-0.5"></TableCell>
           </TableRow>
         </TableBody>
       </Table>
