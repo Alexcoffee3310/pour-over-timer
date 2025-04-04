@@ -39,26 +39,28 @@ const TimerStagesTable: React.FC<TimerStagesTableProps> = ({
           {sections.map((section, index) => (
             <TableRow 
               key={index}
-              className={currentSectionIndex === index ? 'bg-timer-primary/10 font-medium' : 'hover:bg-white/30'}
+              className={currentSectionIndex === index 
+                ? 'bg-timer-primary/10 font-medium backdrop-blur-sm shadow-sm' 
+                : 'hover:bg-white/30 transition-all duration-300'}
             >
-              <TableCell className="text-center">{index + 1}</TableCell>
-              <TableCell>{section.name}</TableCell>
-              <TableCell className="text-right font-mono">{formatTime(section.timeInSeconds)}</TableCell>
+              <TableCell className="text-center font-light">{index + 1}</TableCell>
+              <TableCell className="font-light tracking-wide">{section.name}</TableCell>
+              <TableCell className="text-right font-mono font-light">{formatTime(section.timeInSeconds)}</TableCell>
               <TableCell className="text-right">
                 {section.type === 'pour' ? (
                   <div className="flex items-center justify-end gap-1">
-                    <span>{section.pourAmount || '-'}</span>
-                    {section.pourAmount && <Droplets className="h-3 w-3 text-blue-600" />}
+                    <span className="font-light">{section.pourAmount || '-'}</span>
+                    {section.pourAmount && <Droplets className="h-3 w-3 text-timer-primary" />}
                   </div>
                 ) : '-'}
               </TableCell>
               <TableCell className="text-center">
                 {section.type === 'sit' ? (
-                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-amber-100 text-amber-800 shadow-sm">
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-amber-100/80 text-amber-800 backdrop-blur-sm shadow-sm">
                     Wait
                   </span>
                 ) : (
-                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-blue-100 text-blue-800 shadow-sm">
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-timer-primary/10 text-timer-primary backdrop-blur-sm shadow-sm">
                     Pour
                   </span>
                 )}
@@ -73,7 +75,7 @@ const TimerStagesTable: React.FC<TimerStagesTableProps> = ({
             <TableCell className="text-right">
               <div className="flex items-center justify-end gap-1">
                 <span>{totalPourAmount || '-'}</span>
-                {totalPourAmount > 0 && <Droplets className="h-3 w-3 text-blue-600" />}
+                {totalPourAmount > 0 && <Droplets className="h-3 w-3 text-timer-primary" />}
               </div>
             </TableCell>
             <TableCell></TableCell>
