@@ -22,12 +22,12 @@ const TimerStagesTable: React.FC<TimerStagesTableProps> = ({
   return (
     <div className="w-full overflow-hidden rounded-md shadow-sm border border-timer-secondary/20 rustic-glass">
       <Table>
-        <TableHeader className="bg-timer-primary/10">
+        <TableHeader className="bg-timer-primary/10 h-[70%]"> {/* Flattened height by 30% */}
           <TableRow>
-            <TableHead className="w-10 text-center font-medium text-timer-text/90 py-1 text-xs">#</TableHead>
-            <TableHead className="font-medium text-timer-text/90 py-1 text-xs">Stage</TableHead>
-            <TableHead className="text-right font-medium text-timer-text/90 py-1 text-xs">Duration</TableHead>
-            <TableHead className="text-right font-medium text-timer-text/90 py-1 text-xs">Pour to (ml)</TableHead>
+            <TableHead className="w-10 text-center font-medium text-timer-text/90 py-0.5 text-xs">#</TableHead>
+            <TableHead className="font-medium text-timer-text/90 py-0.5 text-xs">Stage</TableHead>
+            <TableHead className="text-right font-medium text-timer-text/90 py-0.5 text-xs">Duration</TableHead>
+            <TableHead className="text-right font-medium text-timer-text/90 py-0.5 text-xs">Pour to (ml)</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>

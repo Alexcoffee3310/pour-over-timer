@@ -13,7 +13,7 @@ const Index = () => {
           </h1>
         </div>
         
-        <p className="text-sm font-light text-timer-text/60 mb-3 tracking-wide text-center">
+        <p className="text-sm font-light text-timer-text/60 mb-1 tracking-wide text-center">
           Craft your perfect brew with customizable recipes
         </p>
         

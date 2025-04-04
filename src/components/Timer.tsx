@@ -350,15 +350,45 @@ const Timer: React.FC<TimerProps> = ({ initialTimeInSeconds = 60 }) => {
   const showSaveButton = isCurrentRecipeModified() && !timerState.isRunning;
 
   return (
-    <div className="flex flex-col items-center gap-3">
+    <div className="flex flex-col items-center gap-2">
       <RecipeSelector
         recipes={recipes}
         selectedRecipeId={selectedRecipeId}
         onSelectRecipe={handleSelectRecipe}
       />
       
-      <div className="flex flex-col md:flex-row gap-3 w-full">
-        <div className="flex-1 bg-white/10 backdrop-blur-sm p-3 rounded-xl shadow-sm">
+      <div className="flex flex-col md:flex-row gap-2 w-full">
+        <div className="flex-1 flex flex-col bg-white/10 backdrop-blur-sm p-3 rounded-xl shadow-sm space-y-2">
+          {/* Clock moved inside the TimerStagesTable container */}
+          <div className="flex justify-center mb-1">
+            <div className="relative">
+              <CircularProgress 
+                progress={progress} 
+                size={150} 
+                strokeWidth={10} 
+                isCompleted={timerState.isCompleted}
+              />
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="text-center">
+                  <div className="text-xs font-medium text-timer-text/70 uppercase tracking-wider mb-1">
+                    {currentSection.name}
+                  </div>
+                  <div className="text-3xl font-light text-timer-text mb-1">
+                    {formatTime(timeRemaining)}
+                  </div>
+                  <div className="text-xs text-timer-text/70 tracking-wide">
+                    {timerState.isRunning ? 'Brewing...' : timerState.isCompleted ? 'Completed' : 'Ready'}
+                  </div>
+                  {currentSection.pourAmount && currentSection.type === 'pour' && (
+                    <div className="text-xs text-timer-primary font-medium mt-1 bg-timer-primary/5 px-2 py-0.5 rounded-full backdrop-blur-sm">
+                      {currentSection.pourAmount} ml
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+          
           <TimerStagesTable 
             sections={timerState.sections}
             currentSectionIndex={timerState.currentSectionIndex}
@@ -368,7 +398,7 @@ const Timer: React.FC<TimerProps> = ({ initialTimeInSeconds = 60 }) => {
           {showSaveButton && (
             <Button 
               onClick={handleSaveRecipe}
-              className="bg-green-600 hover:bg-green-700 text-white mb-1 mt-2"
+              className="bg-green-600 hover:bg-green-700 text-white mb-1 mt-1"
               size="sm"
             >
               <Save className="w-4 h-4 mr-2" />
@@ -378,34 +408,7 @@ const Timer: React.FC<TimerProps> = ({ initialTimeInSeconds = 60 }) => {
         </div>
         
         <div className="flex-1 flex flex-col items-center bg-white/10 backdrop-blur-sm p-3 rounded-xl shadow-sm">
-          <div className="relative mb-2">
-            <CircularProgress 
-              progress={progress} 
-              size={200} 
-              strokeWidth={12} 
-              isCompleted={timerState.isCompleted}
-            />
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="text-center">
-                <div className="text-sm font-medium text-timer-text/70 uppercase tracking-wider mb-1">
-                  {currentSection.name}
-                </div>
-                <div className="text-4xl font-light text-timer-text mb-1">
-                  {formatTime(timeRemaining)}
-                </div>
-                <div className="text-xs text-timer-text/70 tracking-wide">
-                  {timerState.isRunning ? 'Brewing...' : timerState.isCompleted ? 'Completed' : 'Ready'}
-                </div>
-                {currentSection.pourAmount && currentSection.type === 'pour' && (
-                  <div className="text-sm text-timer-primary font-medium mt-1 bg-timer-primary/5 px-3 py-1 rounded-full backdrop-blur-sm">
-                    {currentSection.pourAmount} ml
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-          
-          <div className="w-full mt-1">
+          <div className="w-full">
             <TimerControls
               sections={timerState.sections}
               isRunning={timerState.isRunning}
