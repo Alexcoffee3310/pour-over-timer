@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Clock, Play, Pause, RotateCcw } from 'lucide-react';
+import { Clock, Play, Pause, RotateCcw, Droplets } from 'lucide-react';
 import { toSeconds } from '@/utils/time-formatter';
 import { TimerSection } from '@/types/timer';
 
@@ -13,6 +13,7 @@ interface TimerControlsProps {
   onPause: () => void;
   onReset: () => void;
   onSetTime: (sectionIndex: number, seconds: number) => void;
+  onSetPourAmount: (sectionIndex: number, amount: number) => void;
 }
 
 const TimerControls: React.FC<TimerControlsProps> = ({
@@ -21,13 +22,15 @@ const TimerControls: React.FC<TimerControlsProps> = ({
   onStart,
   onPause,
   onReset,
-  onSetTime
+  onSetTime,
+  onSetPourAmount
 }) => {
   const [sectionIndex, setSectionIndex] = useState<number>(0);
   const [timeInput, setTimeInput] = useState<{ minutes: string, seconds: string }>({
     minutes: '0',
     seconds: '0'
   });
+  const [pourAmountInput, setPourAmountInput] = useState<string>('0');
 
   const handleSetTime = () => {
     const totalSeconds = toSeconds(
@@ -41,6 +44,14 @@ const TimerControls: React.FC<TimerControlsProps> = ({
     }
   };
 
+  const handleSetPourAmount = () => {
+    const amount = parseInt(pourAmountInput) || 0;
+    
+    if (amount >= 0) {
+      onSetPourAmount(sectionIndex, amount);
+    }
+  };
+
   const handleTimeInputChange = (field: 'minutes' | 'seconds', value: string) => {
     setTimeInput(prev => ({
       ...prev,
@@ -49,8 +60,20 @@ const TimerControls: React.FC<TimerControlsProps> = ({
   };
 
   const handleSectionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setSectionIndex(Number(e.target.value));
+    const index = Number(e.target.value);
+    setSectionIndex(index);
+    
+    // Update pour amount input when changing section
+    const section = sections[index];
+    if (section.type === 'pour') {
+      setPourAmountInput((section.pourAmount || 0).toString());
+    } else {
+      setPourAmountInput('0');
+    }
   };
+
+  const currentSection = sections[sectionIndex];
+  const isPourSection = currentSection?.type === 'pour';
 
   return (
     <div className="flex flex-col gap-3 w-full">
@@ -97,6 +120,31 @@ const TimerControls: React.FC<TimerControlsProps> = ({
           <span className="sr-only">Set Time</span>
         </Button>
       </div>
+      
+      {isPourSection && (
+        <div className="flex items-center gap-2 mb-2">
+          <div className="w-40 text-sm text-gray-500">Pour amount:</div>
+          <Input
+            type="number"
+            min="0"
+            value={pourAmountInput}
+            onChange={(e) => setPourAmountInput(e.target.value)}
+            className="w-full text-center"
+            placeholder="ml"
+            disabled={!isPourSection}
+          />
+          
+          <Button 
+            onClick={handleSetPourAmount} 
+            size="sm"
+            className="bg-blue-600 hover:bg-blue-700"
+            disabled={!isPourSection}
+          >
+            <Droplets className="w-4 h-4" />
+            <span className="sr-only">Set Amount</span>
+          </Button>
+        </div>
+      )}
       
       <div className="flex items-center justify-center gap-4">
         {isRunning ? (

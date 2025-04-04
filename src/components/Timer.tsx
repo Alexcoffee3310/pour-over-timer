@@ -19,11 +19,11 @@ const DEFAULT_RECIPES: Recipe[] = [
     name: 'Recipe A - Quick (95s)',
     description: 'A quick brew with shorter intervals between pours',
     sections: [
-      { name: 'Bloom', timeInSeconds: 45, type: 'pour' },
+      { name: 'Bloom', timeInSeconds: 45, type: 'pour', pourAmount: 60 },
       { name: 'Bloom Sit', timeInSeconds: 10, type: 'sit' },
-      { name: '1st Pour', timeInSeconds: 10, type: 'pour' },
+      { name: '1st Pour', timeInSeconds: 10, type: 'pour', pourAmount: 100 },
       { name: '1st Pour Sit', timeInSeconds: 10, type: 'sit' },
-      { name: '2nd Pour', timeInSeconds: 10, type: 'pour' },
+      { name: '2nd Pour', timeInSeconds: 10, type: 'pour', pourAmount: 100 },
       { name: '2nd Pour Sit', timeInSeconds: 10, type: 'sit' }
     ]
   },
@@ -32,11 +32,11 @@ const DEFAULT_RECIPES: Recipe[] = [
     name: 'Recipe B - Balanced (120s)',
     description: 'A balanced brew with medium intervals',
     sections: [
-      { name: 'Bloom', timeInSeconds: 45, type: 'pour' },
+      { name: 'Bloom', timeInSeconds: 45, type: 'pour', pourAmount: 60 },
       { name: 'Bloom Sit', timeInSeconds: 15, type: 'sit' },
-      { name: '1st Pour', timeInSeconds: 15, type: 'pour' },
+      { name: '1st Pour', timeInSeconds: 15, type: 'pour', pourAmount: 120 },
       { name: '1st Pour Sit', timeInSeconds: 15, type: 'sit' },
-      { name: '2nd Pour', timeInSeconds: 15, type: 'pour' },
+      { name: '2nd Pour', timeInSeconds: 15, type: 'pour', pourAmount: 120 },
       { name: '2nd Pour Sit', timeInSeconds: 15, type: 'sit' }
     ]
   },
@@ -45,11 +45,11 @@ const DEFAULT_RECIPES: Recipe[] = [
     name: 'Recipe C - Extended (145s)',
     description: 'A longer brew with extended intervals for deeper extraction',
     sections: [
-      { name: 'Bloom', timeInSeconds: 45, type: 'pour' },
+      { name: 'Bloom', timeInSeconds: 45, type: 'pour', pourAmount: 60 },
       { name: 'Bloom Sit', timeInSeconds: 20, type: 'sit' },
-      { name: '1st Pour', timeInSeconds: 20, type: 'pour' },
+      { name: '1st Pour', timeInSeconds: 20, type: 'pour', pourAmount: 140 },
       { name: '1st Pour Sit', timeInSeconds: 20, type: 'sit' },
-      { name: '2nd Pour', timeInSeconds: 20, type: 'pour' },
+      { name: '2nd Pour', timeInSeconds: 20, type: 'pour', pourAmount: 140 },
       { name: '2nd Pour Sit', timeInSeconds: 20, type: 'sit' }
     ]
   },
@@ -253,6 +253,31 @@ const Timer: React.FC<TimerProps> = ({ initialTimeInSeconds = 60 }) => {
     }
   };
 
+  const handleSetPourAmount = (sectionIndex: number, amount: number) => {
+    if (amount < 0) return;
+    
+    setTimerState(prev => {
+      const updatedSections = [...prev.sections];
+      updatedSections[sectionIndex] = {
+        ...updatedSections[sectionIndex],
+        pourAmount: amount
+      };
+      
+      return {
+        ...prev,
+        sections: updatedSections,
+        isRunning: false,
+        isCompleted: false
+      };
+    });
+    
+    toast({
+      title: "Pour amount updated",
+      description: `Updated to ${amount} ml`,
+      duration: 2000,
+    });
+  };
+
   const handleSaveRecipe = () => {
     if (timerState.isRunning) {
       toast({
@@ -385,6 +410,7 @@ const Timer: React.FC<TimerProps> = ({ initialTimeInSeconds = 60 }) => {
               onPause={handlePause}
               onReset={handleReset}
               onSetTime={handleSetTime}
+              onSetPourAmount={handleSetPourAmount}
             />
           </div>
         </div>
