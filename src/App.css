@@ -1,3 +1,4 @@
+
 #root {
   margin: 0 auto;
   padding: 0;
@@ -15,10 +16,10 @@
   transition: filter 300ms;
 }
 .logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
+  filter: drop-shadow(0 0 2em rgba(160, 82, 45, 0.6));
 }
 .logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+  filter: drop-shadow(0 0 2em rgba(160, 82, 45, 0.6));
 }
 
 @keyframes logo-spin {
@@ -38,8 +39,32 @@
 
 .card {
   padding: 2em;
+  background-color: rgba(255, 255, 255, 0.7);
+  border-radius: 0.5rem;
+  border: 1px solid rgba(160, 82, 45, 0.1);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
 .read-the-docs {
-  color: #888;
+  color: rgba(101, 67, 33, 0.8);
+}
+
+/* Rustic scrollbar styles */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(245, 222, 179, 0.2);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(160, 82, 45, 0.3);
+  border-radius: 4px;
+  border: 2px solid rgba(245, 222, 179, 0.1);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(160, 82, 45, 0.5);
 }

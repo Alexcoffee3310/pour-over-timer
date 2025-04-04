@@ -4,14 +4,14 @@ import Timer from '@/components/Timer';
 
 const Index = () => {
   return (
-    <div className="min-h-screen bg-timer-background flex flex-col items-center justify-start p-4 pt-8 luxury-gradient">
+    <div className="min-h-screen bg-timer-background flex flex-col items-center justify-start p-4 pt-8 rustic-gradient wood-texture">
       <div className="text-center mb-4">
         <h1 className="text-3xl font-bold tracking-tight text-timer-text">
-          Pour over timer
+          Pour Over Timer
         </h1>
       </div>
       
-      <p className="text-sm font-light text-timer-text/50 mb-3 tracking-wide text-center">
+      <p className="text-sm font-light text-timer-text/60 mb-3 tracking-wide text-center">
         Craft your perfect brew with customizable recipes
       </p>
       
