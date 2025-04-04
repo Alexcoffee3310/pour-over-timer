@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { cn } from '@/lib/utils';
 
@@ -41,7 +40,6 @@ const CircularProgress: React.FC<CircularProgressProps> = ({
           isCompleted && "timer-complete-animation"
         )}
       >
-        {/* Background circle */}
         <circle
           cx={center}
           cy={center}
@@ -51,7 +49,6 @@ const CircularProgress: React.FC<CircularProgressProps> = ({
           className={cn(backgroundColor)}
         />
         
-        {/* Progress circle */}
         <circle
           cx={center}
           cy={center}
@@ -64,11 +61,10 @@ const CircularProgress: React.FC<CircularProgressProps> = ({
           className={cn(
             "transition-all duration-200 ease-linear",
             progressColor,
-            "filter drop-shadow-md" // Add subtle shadow for depth
+            "filter drop-shadow-md"
           )}
         />
         
-        {/* Add subtle inner ring for luxury feel */}
         <circle
           cx={center}
           cy={center}
