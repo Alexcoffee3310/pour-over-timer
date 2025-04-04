@@ -349,15 +349,15 @@ const Timer: React.FC<TimerProps> = ({ initialTimeInSeconds = 60 }) => {
   const showSaveButton = isCurrentRecipeModified() && !timerState.isRunning;
 
   return (
-    <div className="flex flex-col items-center gap-4">
+    <div className="flex flex-col items-center gap-6">
       <RecipeSelector
         recipes={recipes}
         selectedRecipeId={selectedRecipeId}
         onSelectRecipe={handleSelectRecipe}
       />
       
-      <div className="flex flex-col md:flex-row gap-4 w-full">
-        <div className="flex-1">
+      <div className="flex flex-col md:flex-row gap-8 w-full">
+        <div className="flex-1 bg-white/30 backdrop-blur-sm p-5 rounded-xl border border-white/40 shadow-md">
           <TimerStagesTable 
             sections={timerState.sections}
             currentSectionIndex={timerState.currentSectionIndex}
@@ -367,7 +367,7 @@ const Timer: React.FC<TimerProps> = ({ initialTimeInSeconds = 60 }) => {
           {showSaveButton && (
             <Button 
               onClick={handleSaveRecipe}
-              className="bg-green-600 hover:bg-green-700 text-white mb-2"
+              className="bg-green-600 hover:bg-green-700 text-white mb-2 mt-3"
               size="sm"
             >
               <Save className="w-4 h-4 mr-2" />
@@ -376,27 +376,27 @@ const Timer: React.FC<TimerProps> = ({ initialTimeInSeconds = 60 }) => {
           )}
         </div>
         
-        <div className="flex-1 flex flex-col items-center">
-          <div className="relative mb-4">
+        <div className="flex-1 flex flex-col items-center bg-white/20 backdrop-blur-sm p-6 rounded-xl border border-white/30 shadow-md">
+          <div className="relative mb-6">
             <CircularProgress 
               progress={progress} 
-              size={200} 
+              size={220} 
               strokeWidth={12} 
               isCompleted={timerState.isCompleted}
             />
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="text-center">
-                <div className="text-sm font-medium text-timer-text/70 mb-1">
+                <div className="text-sm font-medium text-timer-text/70 uppercase tracking-wider mb-1">
                   {currentSection.name}
                 </div>
-                <div className="text-3xl font-bold text-timer-text mb-1">
+                <div className="text-4xl font-light text-timer-text mb-1">
                   {formatTime(timeRemaining)}
                 </div>
-                <div className="text-xs text-timer-text/70">
-                  {timerState.isRunning ? 'Counting down...' : timerState.isCompleted ? 'Completed!' : 'Ready'}
+                <div className="text-xs text-timer-text/70 tracking-wide">
+                  {timerState.isRunning ? 'Brewing...' : timerState.isCompleted ? 'Completed' : 'Ready'}
                 </div>
                 {currentSection.pourAmount && currentSection.type === 'pour' && (
-                  <div className="text-xs text-timer-primary font-medium mt-1">
+                  <div className="text-sm text-timer-primary font-medium mt-2 bg-timer-primary/5 px-3 py-1 rounded-full border border-timer-primary/20 backdrop-blur-sm">
                     {currentSection.pourAmount} ml
                   </div>
                 )}
@@ -404,7 +404,7 @@ const Timer: React.FC<TimerProps> = ({ initialTimeInSeconds = 60 }) => {
             </div>
           </div>
           
-          <div className="w-full">
+          <div className="w-full mt-2">
             <TimerControls
               sections={timerState.sections}
               isRunning={timerState.isRunning}

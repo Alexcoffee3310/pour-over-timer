@@ -24,22 +24,22 @@ const TimerStagesTable: React.FC<TimerStagesTableProps> = ({
     sum + (section.type === 'pour' ? (section.pourAmount || 0) : 0), 0);
   
   return (
-    <div className="w-full overflow-hidden rounded-md border mb-4">
+    <div className="w-full overflow-hidden rounded-xl border border-white/30 shadow-inner backdrop-blur-sm">
       <Table>
-        <TableHeader>
+        <TableHeader className="bg-timer-primary/5">
           <TableRow>
-            <TableHead className="w-10 text-center">#</TableHead>
-            <TableHead>Stage</TableHead>
-            <TableHead className="text-right">Duration</TableHead>
-            <TableHead className="text-right">Pour (ml)</TableHead>
-            <TableHead className="w-20 text-center">Type</TableHead>
+            <TableHead className="w-10 text-center font-medium text-timer-text/80">#</TableHead>
+            <TableHead className="font-medium text-timer-text/80">Stage</TableHead>
+            <TableHead className="text-right font-medium text-timer-text/80">Duration</TableHead>
+            <TableHead className="text-right font-medium text-timer-text/80">Pour (ml)</TableHead>
+            <TableHead className="w-20 text-center font-medium text-timer-text/80">Type</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {sections.map((section, index) => (
             <TableRow 
               key={index}
-              className={currentSectionIndex === index ? 'bg-timer-primary/10 font-medium' : ''}
+              className={currentSectionIndex === index ? 'bg-timer-primary/10 font-medium' : 'hover:bg-white/30'}
             >
               <TableCell className="text-center">{index + 1}</TableCell>
               <TableCell>{section.name}</TableCell>
@@ -54,11 +54,11 @@ const TimerStagesTable: React.FC<TimerStagesTableProps> = ({
               </TableCell>
               <TableCell className="text-center">
                 {section.type === 'sit' ? (
-                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-amber-100 text-amber-800">
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-amber-100 text-amber-800 shadow-sm">
                     Wait
                   </span>
                 ) : (
-                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-blue-100 text-blue-800">
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-blue-100 text-blue-800 shadow-sm">
                     Pour
                   </span>
                 )}
@@ -67,8 +67,8 @@ const TimerStagesTable: React.FC<TimerStagesTableProps> = ({
           ))}
           
           {/* Total row */}
-          <TableRow className="font-medium bg-gray-50">
-            <TableCell colSpan={2} className="text-right">Total</TableCell>
+          <TableRow className="font-medium bg-timer-primary/5 border-t border-white/30">
+            <TableCell colSpan={2} className="text-right text-timer-text/80">Total</TableCell>
             <TableCell className="text-right font-mono">{formatTime(totalTimeInSeconds)}</TableCell>
             <TableCell className="text-right">
               <div className="flex items-center justify-end gap-1">
