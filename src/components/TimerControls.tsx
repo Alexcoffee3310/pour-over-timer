@@ -122,7 +122,7 @@ const TimerControls: React.FC<TimerControlsProps> = ({
       
       {isPourSection && (
         <div className="flex items-center gap-2 mb-1">
-          <div className="w-20 text-sm text-timer-text/80 font-medium">Pour amount (ml):</div>
+          <div className="w-40 text-sm text-timer-text/80 font-medium">Pour amount (ml):</div>
           <Input
             type="number"
             min="0"
