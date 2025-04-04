@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { useToast } from '@/components/ui/use-toast';
 import { Save } from 'lucide-react';
@@ -20,11 +21,11 @@ const DEFAULT_RECIPES: Recipe[] = [
     description: 'A quick brew with shorter intervals between pours',
     sections: [
       { name: 'Bloom', timeInSeconds: 45, type: 'pour', pourAmount: 60 },
-      { name: 'Bloom Sit', timeInSeconds: 10, type: 'sit' },
+      { name: 'Wait', timeInSeconds: 10, type: 'sit' },
       { name: '1st Pour', timeInSeconds: 10, type: 'pour', pourAmount: 100 },
-      { name: '1st Pour Sit', timeInSeconds: 10, type: 'sit' },
+      { name: 'Wait', timeInSeconds: 10, type: 'sit' },
       { name: '2nd Pour', timeInSeconds: 10, type: 'pour', pourAmount: 100 },
-      { name: '2nd Pour Sit', timeInSeconds: 10, type: 'sit' }
+      { name: 'Wait', timeInSeconds: 10, type: 'sit' }
     ]
   },
   {
@@ -33,11 +34,11 @@ const DEFAULT_RECIPES: Recipe[] = [
     description: 'A balanced brew with medium intervals',
     sections: [
       { name: 'Bloom', timeInSeconds: 45, type: 'pour', pourAmount: 60 },
-      { name: 'Bloom Sit', timeInSeconds: 15, type: 'sit' },
+      { name: 'Wait', timeInSeconds: 15, type: 'sit' },
       { name: '1st Pour', timeInSeconds: 15, type: 'pour', pourAmount: 120 },
-      { name: '1st Pour Sit', timeInSeconds: 15, type: 'sit' },
+      { name: 'Wait', timeInSeconds: 15, type: 'sit' },
       { name: '2nd Pour', timeInSeconds: 15, type: 'pour', pourAmount: 120 },
-      { name: '2nd Pour Sit', timeInSeconds: 15, type: 'sit' }
+      { name: 'Wait', timeInSeconds: 15, type: 'sit' }
     ]
   },
   {
@@ -46,11 +47,11 @@ const DEFAULT_RECIPES: Recipe[] = [
     description: 'A longer brew with extended intervals for deeper extraction',
     sections: [
       { name: 'Bloom', timeInSeconds: 45, type: 'pour', pourAmount: 60 },
-      { name: 'Bloom Sit', timeInSeconds: 20, type: 'sit' },
+      { name: 'Wait', timeInSeconds: 20, type: 'sit' },
       { name: '1st Pour', timeInSeconds: 20, type: 'pour', pourAmount: 140 },
-      { name: '1st Pour Sit', timeInSeconds: 20, type: 'sit' },
+      { name: 'Wait', timeInSeconds: 20, type: 'sit' },
       { name: '2nd Pour', timeInSeconds: 20, type: 'pour', pourAmount: 140 },
-      { name: '2nd Pour Sit', timeInSeconds: 20, type: 'sit' }
+      { name: 'Wait', timeInSeconds: 20, type: 'sit' }
     ]
   },
 ];
