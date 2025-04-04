@@ -3,6 +3,7 @@ export interface TimerSection {
   name: string;
   timeInSeconds: number;
   type?: 'pour' | 'sit';
+  pourAmount?: number; // Amount in ml
 }
 
 export interface Recipe {
