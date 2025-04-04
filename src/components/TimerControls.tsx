@@ -128,7 +128,7 @@ const TimerControls: React.FC<TimerControlsProps> = ({
             min="0"
             value={pourAmountInput}
             onChange={(e) => setPourAmountInput(e.target.value)}
-            className="w-full text-center bg-white/40 border-white/40 h-8"
+            className="w-1/2 text-center bg-white/40 border-white/40 h-8"
             placeholder="ml"
             disabled={!isPourSection}
           />
