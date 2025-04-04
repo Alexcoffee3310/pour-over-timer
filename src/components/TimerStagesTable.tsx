@@ -19,10 +19,6 @@ const TimerStagesTable: React.FC<TimerStagesTableProps> = ({
   // Calculate the total time of all sections
   const totalTimeInSeconds = sections.reduce((sum, section) => sum + section.timeInSeconds, 0);
   
-  // Calculate total pour amount
-  const totalPourAmount = sections.reduce((sum, section) => 
-    sum + (section.type === 'pour' ? (section.pourAmount || 0) : 0), 0);
-  
   return (
     <div className="w-full overflow-hidden rounded-xl shadow-sm backdrop-blur-sm">
       <Table>
@@ -56,16 +52,11 @@ const TimerStagesTable: React.FC<TimerStagesTableProps> = ({
             </TableRow>
           ))}
           
-          {/* Total row */}
+          {/* Total row - only for duration */}
           <TableRow className="font-medium bg-timer-primary/5">
             <TableCell colSpan={2} className="text-right text-timer-text/80 py-0.5">Total</TableCell>
             <TableCell className="text-right font-mono py-0.5">{formatTime(totalTimeInSeconds)}</TableCell>
-            <TableCell className="text-right py-0.5">
-              <div className="flex items-center justify-end gap-1">
-                <span>{totalPourAmount || '-'}</span>
-                {totalPourAmount > 0 && <Droplets className="h-3 w-3 text-timer-primary" />}
-              </div>
-            </TableCell>
+            <TableCell className="text-right py-0.5">-</TableCell>
           </TableRow>
         </TableBody>
       </Table>
