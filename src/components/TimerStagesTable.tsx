@@ -27,7 +27,7 @@ const TimerStagesTable: React.FC<TimerStagesTableProps> = ({
             <TableHead className="w-10 text-center font-medium text-timer-text/80 py-1">#</TableHead>
             <TableHead className="font-medium text-timer-text/80 py-1">Stage</TableHead>
             <TableHead className="text-right font-medium text-timer-text/80 py-1">Duration</TableHead>
-            <TableHead className="text-right font-medium text-timer-text/80 py-1">Pour (ml)</TableHead>
+            <TableHead className="text-right font-medium text-timer-text/80 py-1">Pour to (ml)</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
