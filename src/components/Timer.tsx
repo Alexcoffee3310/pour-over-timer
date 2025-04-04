@@ -395,9 +395,11 @@ const Timer: React.FC<TimerProps> = ({ initialTimeInSeconds = 60 }) => {
                 <div className="text-xs text-timer-text/70">
                   {timerState.isRunning ? 'Counting down...' : timerState.isCompleted ? 'Completed!' : 'Ready'}
                 </div>
-                <div className="text-xs text-timer-text/70 mt-1">
-                  Total: {formatTime(timerState.totalTimeInSeconds || 0)}
-                </div>
+                {currentSection.pourAmount && currentSection.type === 'pour' && (
+                  <div className="text-xs text-timer-primary font-medium mt-1">
+                    {currentSection.pourAmount} ml
+                  </div>
+                )}
               </div>
             </div>
           </div>
