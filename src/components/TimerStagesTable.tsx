@@ -19,14 +19,23 @@ const TimerStagesTable: React.FC<TimerStagesTableProps> = ({
   // Calculate the total time of all sections
   const totalTimeInSeconds = sections.reduce((sum, section) => sum + section.timeInSeconds, 0);
   
+  // Calculate accumulated time for each section
+  const accumulatedTimes: number[] = [];
+  let runningTotal = 0;
+  sections.forEach((section) => {
+    runningTotal += section.timeInSeconds;
+    accumulatedTimes.push(runningTotal);
+  });
+  
   return (
     <div className="w-full overflow-hidden rounded-md shadow-sm border border-timer-secondary/20 rustic-glass">
       <Table>
-        <TableHeader className="bg-timer-primary/10 h-[70%]"> {/* Flattened height by 30% */}
+        <TableHeader className="bg-timer-primary/10 h-[70%]">
           <TableRow>
             <TableHead className="w-10 text-center font-medium text-timer-text/90 py-0.5 text-xs">#</TableHead>
             <TableHead className="font-medium text-timer-text/90 py-0.5 text-xs">Stage</TableHead>
             <TableHead className="text-right font-medium text-timer-text/90 py-0.5 text-xs">Duration</TableHead>
+            <TableHead className="text-right font-medium text-timer-text/90 py-0.5 text-xs">Timing</TableHead>
             <TableHead className="text-right font-medium text-timer-text/90 py-0.5 text-xs">Pour to (ml)</TableHead>
           </TableRow>
         </TableHeader>
@@ -41,6 +50,7 @@ const TimerStagesTable: React.FC<TimerStagesTableProps> = ({
               <TableCell className="text-center font-light py-0.5 text-xs">{index + 1}</TableCell>
               <TableCell className="font-light tracking-wide py-0.5 text-xs">{section.name}</TableCell>
               <TableCell className="text-right font-mono font-light py-0.5 text-xs">{formatTime(section.timeInSeconds)}</TableCell>
+              <TableCell className="text-right font-mono font-light py-0.5 text-xs">{formatTime(accumulatedTimes[index])}</TableCell>
               <TableCell className="text-right py-0.5 text-xs">
                 {section.type === 'pour' ? (
                   <div className="flex items-center justify-end gap-1">
@@ -55,6 +65,7 @@ const TimerStagesTable: React.FC<TimerStagesTableProps> = ({
           {/* Total row - only for duration */}
           <TableRow className="font-medium bg-timer-primary/10 border-t border-timer-secondary/20">
             <TableCell colSpan={2} className="text-right text-timer-text/80 py-0.5 text-xs">Total</TableCell>
+            <TableCell className="text-right font-mono py-0.5 text-xs">{formatTime(totalTimeInSeconds)}</TableCell>
             <TableCell className="text-right font-mono py-0.5 text-xs">{formatTime(totalTimeInSeconds)}</TableCell>
             <TableCell className="text-right py-0.5 text-xs">-</TableCell>
           </TableRow>
