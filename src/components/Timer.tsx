@@ -22,7 +22,7 @@ const DEFAULT_RECIPES: Recipe[] = [
     sections: [
       { name: 'Bloom', timeInSeconds: 45, type: 'pour', pourAmount: 45 },
       { name: 'Wait', timeInSeconds: 10, type: 'sit' },
-      { name: '1st Pour', timeInSeconds: 10, type: 'pour', pourAmount: 150 },
+      { name: '1st Pour', timeInSeconds: 10, type: 'pour', pourAmount: 200 },
       { name: 'Wait', timeInSeconds: 10, type: 'sit' },
       { name: '2nd Pour', timeInSeconds: 10, type: 'pour', pourAmount: 300 },
       { name: 'Wait', timeInSeconds: 10, type: 'sit' }
@@ -35,7 +35,7 @@ const DEFAULT_RECIPES: Recipe[] = [
     sections: [
       { name: 'Bloom', timeInSeconds: 45, type: 'pour', pourAmount: 45 },
       { name: 'Wait', timeInSeconds: 15, type: 'sit' },
-      { name: '1st Pour', timeInSeconds: 15, type: 'pour', pourAmount: 150 },
+      { name: '1st Pour', timeInSeconds: 15, type: 'pour', pourAmount: 200 },
       { name: 'Wait', timeInSeconds: 15, type: 'sit' },
       { name: '2nd Pour', timeInSeconds: 15, type: 'pour', pourAmount: 300 },
       { name: 'Wait', timeInSeconds: 15, type: 'sit' }
@@ -48,7 +48,7 @@ const DEFAULT_RECIPES: Recipe[] = [
     sections: [
       { name: 'Bloom', timeInSeconds: 45, type: 'pour', pourAmount: 45 },
       { name: 'Wait', timeInSeconds: 20, type: 'sit' },
-      { name: '1st Pour', timeInSeconds: 20, type: 'pour', pourAmount: 150 },
+      { name: '1st Pour', timeInSeconds: 20, type: 'pour', pourAmount: 200 },
       { name: 'Wait', timeInSeconds: 20, type: 'sit' },
       { name: '2nd Pour', timeInSeconds: 20, type: 'pour', pourAmount: 300 },
       { name: 'Wait', timeInSeconds: 20, type: 'sit' }
