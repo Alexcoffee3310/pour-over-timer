@@ -1,12 +1,12 @@
-
 import { useState, useEffect } from 'react';
 import { useToast } from '@/components/ui/use-toast';
 import { Recipe, TimerSection } from '@/types/timer';
+import { formatDuration } from '@/utils/time-formatter';
 
 const DEFAULT_RECIPES: Recipe[] = [
   {
     id: 'recipe-a',
-    name: 'Recipe A - Quick (95s)',
+    name: `Recipe A - Quick (${formatDuration(95)})`,
     description: 'A quick brew with shorter intervals between pours',
     sections: [
       { name: 'Bloom', timeInSeconds: 15, type: 'pour', pourAmount: 45 },
@@ -19,7 +19,7 @@ const DEFAULT_RECIPES: Recipe[] = [
   },
   {
     id: 'recipe-b',
-    name: 'Recipe B - Balanced (120s)',
+    name: `Recipe B - Balanced (${formatDuration(120)})`,
     description: 'A balanced brew with medium intervals',
     sections: [
       { name: 'Bloom', timeInSeconds: 15, type: 'pour', pourAmount: 45 },
@@ -32,7 +32,7 @@ const DEFAULT_RECIPES: Recipe[] = [
   },
   {
     id: 'recipe-c',
-    name: 'Recipe C - Extended (145s)',
+    name: `Recipe C - Extended (${formatDuration(145)})`,
     description: 'A longer brew with extended intervals for deeper extraction',
     sections: [
       { name: 'Bloom', timeInSeconds: 15, type: 'pour', pourAmount: 45 },
@@ -106,7 +106,7 @@ export function useRecipes() {
       
       const newRecipe: Recipe = {
         id: `recipe-${nextRecipeLetter.toLowerCase()}`,
-        name: `Recipe ${nextRecipeLetter} - Custom (${totalSeconds}s)`,
+        name: `Recipe ${nextRecipeLetter} - Custom (${formatDuration(totalSeconds)})`,
         description: 'Your custom pour over recipe',
         sections: [...sections],
         isCustom: true
