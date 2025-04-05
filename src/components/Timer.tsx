@@ -20,8 +20,8 @@ const DEFAULT_RECIPES: Recipe[] = [
     name: 'Recipe A - Quick (95s)',
     description: 'A quick brew with shorter intervals between pours',
     sections: [
-      { name: 'Bloom', timeInSeconds: 45, type: 'pour', pourAmount: 45 },
-      { name: 'Wait', timeInSeconds: 10, type: 'sit' },
+      { name: 'Bloom', timeInSeconds: 15, type: 'pour', pourAmount: 45 },
+      { name: 'Wait', timeInSeconds: 30, type: 'sit' },
       { name: '1st Pour', timeInSeconds: 10, type: 'pour', pourAmount: 200 },
       { name: 'Wait', timeInSeconds: 10, type: 'sit' },
       { name: '2nd Pour', timeInSeconds: 10, type: 'pour', pourAmount: 300 },
@@ -33,8 +33,8 @@ const DEFAULT_RECIPES: Recipe[] = [
     name: 'Recipe B - Balanced (120s)',
     description: 'A balanced brew with medium intervals',
     sections: [
-      { name: 'Bloom', timeInSeconds: 45, type: 'pour', pourAmount: 45 },
-      { name: 'Wait', timeInSeconds: 15, type: 'sit' },
+      { name: 'Bloom', timeInSeconds: 15, type: 'pour', pourAmount: 45 },
+      { name: 'Wait', timeInSeconds: 30, type: 'sit' },
       { name: '1st Pour', timeInSeconds: 15, type: 'pour', pourAmount: 200 },
       { name: 'Wait', timeInSeconds: 15, type: 'sit' },
       { name: '2nd Pour', timeInSeconds: 15, type: 'pour', pourAmount: 300 },
@@ -46,8 +46,8 @@ const DEFAULT_RECIPES: Recipe[] = [
     name: 'Recipe C - Extended (145s)',
     description: 'A longer brew with extended intervals for deeper extraction',
     sections: [
-      { name: 'Bloom', timeInSeconds: 45, type: 'pour', pourAmount: 45 },
-      { name: 'Wait', timeInSeconds: 20, type: 'sit' },
+      { name: 'Bloom', timeInSeconds: 15, type: 'pour', pourAmount: 45 },
+      { name: 'Wait', timeInSeconds: 30, type: 'sit' },
       { name: '1st Pour', timeInSeconds: 20, type: 'pour', pourAmount: 200 },
       { name: 'Wait', timeInSeconds: 20, type: 'sit' },
       { name: '2nd Pour', timeInSeconds: 20, type: 'pour', pourAmount: 300 },
