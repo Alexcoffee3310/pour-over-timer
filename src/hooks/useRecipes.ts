@@ -4,11 +4,11 @@ import { useToast } from '@/components/ui/use-toast';
 import { Recipe, TimerSection } from '@/types/timer';
 import { formatDuration, calculateTotalTime } from '@/utils/time-formatter';
 
-// Update recipe names to show correct total times
+// Define DEFAULT_RECIPES with correct times
 const DEFAULT_RECIPES: Recipe[] = [
   {
     id: 'recipe-a',
-    name: `Recipe A - Quick (${formatDuration(95)})`,
+    name: 'Recipe A - Quick',
     description: 'A quick brew with shorter intervals between pours',
     sections: [
       { name: 'Bloom', timeInSeconds: 15, type: 'pour', pourAmount: 45 },
@@ -21,7 +21,7 @@ const DEFAULT_RECIPES: Recipe[] = [
   },
   {
     id: 'recipe-b',
-    name: `Recipe B - Balanced (${formatDuration(120)})`,
+    name: 'Recipe B - Balanced',
     description: 'A balanced brew with medium intervals',
     sections: [
       { name: 'Bloom', timeInSeconds: 15, type: 'pour', pourAmount: 45 },
@@ -34,7 +34,7 @@ const DEFAULT_RECIPES: Recipe[] = [
   },
   {
     id: 'recipe-c',
-    name: `Recipe C - Extended (${formatDuration(145)})`,
+    name: 'Recipe C - Extended',
     description: 'A longer brew with extended intervals for deeper extraction',
     sections: [
       { name: 'Bloom', timeInSeconds: 15, type: 'pour', pourAmount: 45 },
@@ -47,10 +47,11 @@ const DEFAULT_RECIPES: Recipe[] = [
   },
 ];
 
-// Update recipe names with accurate durations
+// Update each recipe's name with its accurate duration
 DEFAULT_RECIPES.forEach(recipe => {
-  const totalTime = calculateTotalTime(recipe.sections);
-  recipe.name = `Recipe ${recipe.id.split('-')[1].toUpperCase()} - ${recipe.name.split('-')[1].trim().split('(')[0].trim()} (${formatDuration(totalTime)})`;
+  // Calculate the actual total time directly from the sections
+  const totalTime = recipe.sections.reduce((sum, section) => sum + section.timeInSeconds, 0);
+  recipe.name = `${recipe.name} (${formatDuration(totalTime)})`;
 });
 
 const getSavedRecipes = (): Recipe[] => {
@@ -60,11 +61,12 @@ const getSavedRecipes = (): Recipe[] => {
     
     // Update saved recipe names with accurate durations
     parsedRecipes.forEach((recipe: Recipe) => {
-      const totalTime = calculateTotalTime(recipe.sections);
-      const nameParts = recipe.name.split('(');
-      if (nameParts.length > 1) {
-        recipe.name = `${nameParts[0]}(${formatDuration(totalTime)})`;
-      }
+      // Calculate total time accurately for each saved recipe
+      const totalTime = recipe.sections.reduce((sum, section) => sum + section.timeInSeconds, 0);
+      
+      // Extract the base name without the duration part
+      const baseName = recipe.name.split('(')[0].trim();
+      recipe.name = `${baseName} (${formatDuration(totalTime)})`;
     });
     
     return parsedRecipes;
@@ -119,7 +121,8 @@ export function useRecipes() {
         'D'.charCodeAt(0) + existingCustomRecipes.length
       );
       
-      const totalSeconds = calculateTotalTime(sections);
+      // Calculate total seconds directly from sections
+      const totalSeconds = sections.reduce((sum, section) => sum + section.timeInSeconds, 0);
       
       const newRecipe: Recipe = {
         id: `recipe-${nextRecipeLetter.toLowerCase()}`,
