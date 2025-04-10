@@ -1,11 +1,10 @@
-
 import React from 'react';
 import TimerControls from './TimerControls';
 import RecipeSelector from './RecipeSelector';
 import TimerStagesTable from './TimerStagesTable';
 import TimerDisplay from './TimerDisplay';
 import SaveRecipeButton from './SaveRecipeButton';
-import { useTimer } from '@/hooks/useTimer';
+import { useTimer } from '@/hooks/timer/use-timer';
 import { useRecipes } from '@/hooks/useRecipes';
 
 interface TimerProps {
