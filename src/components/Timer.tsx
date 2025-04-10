@@ -32,7 +32,8 @@ const Timer: React.FC<TimerProps> = ({ initialTimeInSeconds = 60 }) => {
     handleReset,
     handleSetTime,
     handleSetPourAmount,
-    updateSections
+    updateSections,
+    handleRestart
   } = useTimer(currentSections);
   
   const onSelectRecipe = (recipeId: string) => {
@@ -84,9 +85,11 @@ const Timer: React.FC<TimerProps> = ({ initialTimeInSeconds = 60 }) => {
             <TimerControls
               sections={timerState.sections}
               isRunning={timerState.isRunning}
+              isCompleted={timerState.isCompleted}
               onStart={handleStart}
               onPause={handlePause}
               onReset={handleReset}
+              onRestart={handleRestart}
               onSetTime={handleSetTime}
               onSetPourAmount={handleSetPourAmount}
             />

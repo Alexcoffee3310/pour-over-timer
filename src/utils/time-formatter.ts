@@ -49,7 +49,7 @@ export function parseTimeString(timeString: string): number {
  */
 export function formatDuration(seconds: number): string {
   const minutes = Math.floor(seconds / 60);
-  const remainingSeconds = seconds % 60;
+  const remainingSeconds = Math.floor(seconds % 60);
   
   if (minutes > 0) {
     return `${minutes}m ${remainingSeconds}s`;
@@ -57,3 +57,9 @@ export function formatDuration(seconds: number): string {
   return `${remainingSeconds}s`;
 }
 
+/**
+ * Calculate total time in seconds from an array of timer sections
+ */
+export function calculateTotalTime(sections: { timeInSeconds: number }[]): number {
+  return sections.reduce((sum, section) => sum + section.timeInSeconds, 0);
+}

@@ -9,9 +9,11 @@ import { TimerSection } from '@/types/timer';
 interface TimerControlsProps {
   sections: TimerSection[];
   isRunning: boolean;
+  isCompleted: boolean;
   onStart: () => void;
   onPause: () => void;
   onReset: () => void;
+  onRestart: () => void;
   onSetTime: (sectionIndex: number, seconds: number) => void;
   onSetPourAmount: (sectionIndex: number, amount: number) => void;
 }
@@ -19,9 +21,11 @@ interface TimerControlsProps {
 const TimerControls: React.FC<TimerControlsProps> = ({
   sections,
   isRunning,
+  isCompleted,
   onStart,
   onPause,
   onReset,
+  onRestart,
   onSetTime,
   onSetPourAmount
 }) => {
@@ -153,6 +157,14 @@ const TimerControls: React.FC<TimerControlsProps> = ({
           >
             <Pause className="w-5 h-5 mr-2" />
             Pause
+          </Button>
+        ) : isCompleted ? (
+          <Button 
+            onClick={onRestart} 
+            className="bg-timer-primary hover:bg-timer-primary/90 text-white flex-1 h-10 shadow-md"
+          >
+            <Play className="w-5 h-5 mr-2" />
+            Restart
           </Button>
         ) : (
           <Button 

@@ -1,8 +1,10 @@
+
 import { useState, useEffect } from 'react';
 import { useToast } from '@/components/ui/use-toast';
 import { Recipe, TimerSection } from '@/types/timer';
-import { formatDuration } from '@/utils/time-formatter';
+import { formatDuration, calculateTotalTime } from '@/utils/time-formatter';
 
+// Update recipe names to show correct total times
 const DEFAULT_RECIPES: Recipe[] = [
   {
     id: 'recipe-a',
@@ -45,10 +47,27 @@ const DEFAULT_RECIPES: Recipe[] = [
   },
 ];
 
+// Update recipe names with accurate durations
+DEFAULT_RECIPES.forEach(recipe => {
+  const totalTime = calculateTotalTime(recipe.sections);
+  recipe.name = `Recipe ${recipe.id.split('-')[1].toUpperCase()} - ${recipe.name.split('-')[1].trim().split('(')[0].trim()} (${formatDuration(totalTime)})`;
+});
+
 const getSavedRecipes = (): Recipe[] => {
   try {
     const savedRecipes = localStorage.getItem('customRecipes');
-    return savedRecipes ? JSON.parse(savedRecipes) : [];
+    const parsedRecipes = savedRecipes ? JSON.parse(savedRecipes) : [];
+    
+    // Update saved recipe names with accurate durations
+    parsedRecipes.forEach((recipe: Recipe) => {
+      const totalTime = calculateTotalTime(recipe.sections);
+      const nameParts = recipe.name.split('(');
+      if (nameParts.length > 1) {
+        recipe.name = `${nameParts[0]}(${formatDuration(totalTime)})`;
+      }
+    });
+    
+    return parsedRecipes;
   } catch (error) {
     console.error('Error loading saved recipes:', error);
     return [];
@@ -100,9 +119,7 @@ export function useRecipes() {
         'D'.charCodeAt(0) + existingCustomRecipes.length
       );
       
-      const totalSeconds = sections.reduce(
-        (sum, section) => sum + section.timeInSeconds, 0
-      );
+      const totalSeconds = calculateTotalTime(sections);
       
       const newRecipe: Recipe = {
         id: `recipe-${nextRecipeLetter.toLowerCase()}`,

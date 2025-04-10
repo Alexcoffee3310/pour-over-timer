@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useToast } from '@/components/ui/use-toast';
 import { TimerSection, TimerState } from '@/types/timer';
+import { calculateTotalTime } from '@/utils/time-formatter';
 
 export function useTimer(initialSections: TimerSection[]) {
   const [timerState, setTimerState] = useState<TimerState>({
@@ -9,7 +10,7 @@ export function useTimer(initialSections: TimerSection[]) {
     currentSectionIndex: 0,
     isRunning: false,
     isCompleted: false,
-    totalTimeInSeconds: initialSections.reduce((sum, section) => sum + section.timeInSeconds, 0)
+    totalTimeInSeconds: calculateTotalTime(initialSections)
   });
   
   const [timeRemaining, setTimeRemaining] = useState(timerState.sections[0].timeInSeconds);
@@ -19,7 +20,7 @@ export function useTimer(initialSections: TimerSection[]) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   
   useEffect(() => {
-    const total = timerState.sections.reduce((sum, section) => sum + section.timeInSeconds, 0);
+    const total = calculateTotalTime(timerState.sections);
     setTimerState(prev => ({
       ...prev,
       totalTimeInSeconds: total
@@ -132,6 +133,11 @@ export function useTimer(initialSections: TimerSection[]) {
     setTimeRemaining(timerState.sections[0].timeInSeconds);
   };
   
+  const handleRestart = () => {
+    handleReset();
+    handleStart();
+  };
+  
   const handleSetTime = (sectionIndex: number, seconds: number) => {
     if (seconds <= 0) return;
     
@@ -142,10 +148,7 @@ export function useTimer(initialSections: TimerSection[]) {
         timeInSeconds: seconds
       };
       
-      const totalTime = updatedSections.reduce(
-        (sum, section) => sum + section.timeInSeconds,
-        0
-      );
+      const totalTime = calculateTotalTime(updatedSections);
       
       return {
         ...prev,
@@ -187,13 +190,15 @@ export function useTimer(initialSections: TimerSection[]) {
   };
 
   const updateSections = (newSections: TimerSection[]) => {
+    const totalTime = calculateTotalTime(newSections);
+    
     setTimerState(prev => ({
       ...prev,
       sections: newSections,
       currentSectionIndex: 0,
       isRunning: false,
       isCompleted: false,
-      totalTimeInSeconds: newSections.reduce((sum, section) => sum + section.timeInSeconds, 0)
+      totalTimeInSeconds: totalTime
     }));
     setTimeRemaining(newSections[0].timeInSeconds);
   };
@@ -211,6 +216,7 @@ export function useTimer(initialSections: TimerSection[]) {
     handleStart,
     handlePause,
     handleReset,
+    handleRestart,
     handleSetTime,
     handleSetPourAmount,
     updateSections
