@@ -42,8 +42,8 @@ export function useTimer(initialSections: TimerSection[]) {
   };
   
   const handleRestart = () => {
-    handleReset();
-    handleStart();
+    resetTimer();
+    startTimer();
   };
   
   const handleSetTime = (sectionIndex: number, seconds: number) => {
