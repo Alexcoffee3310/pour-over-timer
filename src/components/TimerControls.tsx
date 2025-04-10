@@ -78,15 +78,6 @@ const TimerControls: React.FC<TimerControlsProps> = ({
   const currentSection = sections[sectionIndex];
   const isPourSection = currentSection?.type === 'pour';
 
-  // Handler for the primary button (Start/Restart)
-  const handlePrimaryAction = () => {
-    if (isCompleted) {
-      onRestart();
-    } else {
-      onStart();
-    }
-  };
-
   return (
     <div className="flex flex-col gap-2 w-full">
       <div className="flex items-center gap-2 mb-1">
@@ -167,13 +158,21 @@ const TimerControls: React.FC<TimerControlsProps> = ({
             <Pause className="w-5 h-5 mr-2" />
             Pause
           </Button>
-        ) : (
+        ) : isCompleted ? (
           <Button 
-            onClick={handlePrimaryAction} 
+            onClick={onRestart} 
             className="bg-timer-primary hover:bg-timer-primary/90 text-white flex-1 h-10 shadow-md"
           >
             <Play className="w-5 h-5 mr-2" />
-            {isCompleted ? "Restart" : "Start"}
+            Restart
+          </Button>
+        ) : (
+          <Button 
+            onClick={onStart} 
+            className="bg-timer-primary hover:bg-timer-primary/90 text-white flex-1 h-10 shadow-md"
+          >
+            <Play className="w-5 h-5 mr-2" />
+            Start
           </Button>
         )}
         

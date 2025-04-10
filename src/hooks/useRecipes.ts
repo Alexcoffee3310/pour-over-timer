@@ -47,10 +47,12 @@ const DEFAULT_RECIPES: Recipe[] = [
   },
 ];
 
-// Manually verify and set the correct times for each recipe
-DEFAULT_RECIPES[0].name = `Recipe A - Quick (1m 25s)`;  // 15+30+10+10+10+10 = 85s = 1m 25s
-DEFAULT_RECIPES[1].name = `Recipe B - Balanced (1m 45s)`;  // 15+30+15+15+15+15 = 105s = 1m 45s
-DEFAULT_RECIPES[2].name = `Recipe C - Extended (2m 5s)`;  // 15+30+20+20+20+20 = 125s = 2m 5s
+// Update each recipe's name with its accurate duration
+DEFAULT_RECIPES.forEach(recipe => {
+  // Calculate the actual total time directly from the sections
+  const totalTime = recipe.sections.reduce((sum, section) => sum + section.timeInSeconds, 0);
+  recipe.name = `${recipe.name} (${formatDuration(totalTime)})`;
+});
 
 const getSavedRecipes = (): Recipe[] => {
   try {
@@ -64,13 +66,7 @@ const getSavedRecipes = (): Recipe[] => {
       
       // Extract the base name without the duration part
       const baseName = recipe.name.split('(')[0].trim();
-      
-      // Format the duration manually to ensure accuracy
-      const minutes = Math.floor(totalTime / 60);
-      const seconds = totalTime % 60;
-      const formattedTime = seconds > 0 ? `${minutes}m ${seconds}s` : `${minutes}m`;
-      
-      recipe.name = `${baseName} (${formattedTime})`;
+      recipe.name = `${baseName} (${formatDuration(totalTime)})`;
     });
     
     return parsedRecipes;
@@ -128,14 +124,9 @@ export function useRecipes() {
       // Calculate total seconds directly from sections
       const totalSeconds = sections.reduce((sum, section) => sum + section.timeInSeconds, 0);
       
-      // Format the duration manually to ensure accuracy
-      const minutes = Math.floor(totalSeconds / 60);
-      const seconds = totalSeconds % 60;
-      const formattedTime = seconds > 0 ? `${minutes}m ${seconds}s` : `${minutes}m`;
-      
       const newRecipe: Recipe = {
         id: `recipe-${nextRecipeLetter.toLowerCase()}`,
-        name: `Recipe ${nextRecipeLetter} - Custom (${formattedTime})`,
+        name: `Recipe ${nextRecipeLetter} - Custom (${formatDuration(totalSeconds)})`,
         description: 'Your custom pour over recipe',
         sections: [...sections],
         isCustom: true
