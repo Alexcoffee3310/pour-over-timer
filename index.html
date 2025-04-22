@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Start Your Coffee Journey â€“ Simple Pour Over Timer</title>
+    <meta name="description" content="No Bluetooth scale? No problem. Brew the perfect pour over with our timerâ€”track bloom, pours, and total time with precision, no extra gear needed.">
+    <!-- Add Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Update fonts and add Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400;600;700&family=Merriweather:wght@300;400;700&family=Montserrat:wght@600;700&display=swap" rel="stylesheet">
+    <!-- Add custom CSS for luxury styling -->
+    <style>
+        :root {
+            --primary-color: #212931;
+            --accent-color: #646464;
+            --bg-color: #1e252d;
+            --text-color: #ffffff;
+            --card-bg: rgba(255, 255, 255, 0.1);
+            --border-color: rgba(255, 255, 255, 0.2);
+            --success-color: #4a5568;
+            --hover-color: #718096;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            font-family: "Source Sans Pro", sans-serif;
+            color: var(--text-color);
+            margin: 0;
+            min-height: 100vh;
+            line-height: 1.65;
+        }
+
+        .navbar {
+            background-color: var(--primary-color);
+            border-bottom: 1px solid var(--border-color);
+            position: fixed;
+            width: 100%;
+            z-index: 1000;
+            padding: 1rem;
+        }
+
+        .navbar-brand {
+            color: var(--text-color) !important;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.6rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr;  /* Default for mobile */
+            gap: 2rem;
+            padding: 6rem 1rem 2rem;
+            max-width: 1800px;
+            margin: 0 auto;
+        }
+
+        /* Desktop layout */
+        @media (min-width: 1024px) {
+            .dashboard {
+                grid-template-columns: minmax(400px, 40%) minmax(600px, 60%);
+                padding: 6rem 4rem 2rem;
+            }
+
+            .dashboard-panel {
+                max-width: 100%;
+            }
+
+            /* Increase timer size for desktop */
+            .circular-timer {
+                width: 300px;
+                height: 300px;
+            }
+
+            .circular-timer svg {
+                width: 300px;
+                height: 300px;
+            }
+
+            .timer-text {
+                font-size: 3.5rem;
+            }
+
+            .pour-volume {
+                font-size: 1.3rem;
+            }
+
+            /* Improve table layout on desktop */
+            .recipe-table {
+                min-width: 600px;
+                margin: 0 auto;
+            }
+
+            .recipe-table th,
+            .recipe-table td {
+                padding: 1rem;
+            }
+        }
+
+        .dashboard-panel {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 2rem;
+            border: 1px solid var(--border-color);
+            overflow-x: auto; /* Add horizontal scroll if needed */
+            max-width: 100%; /* Ensure panel doesn't overflow its container */
+        }
+
+        .section-title {
+            font-family: "Source Sans Pro", Helvetica, sans-serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-color);
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 0.3rem;
+            margin-bottom: 1rem;
+        }
+
+        .form-control {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 0.75rem;
+        }
+
+        .form-control:focus {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--accent-color);
+            color: var(--text-color);
+            box-shadow: none;
+        }
+
+        .form-label {
+            color: var(--text-color);
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        button {
+            background: var(--accent-color) !important;
+            color: var(--text-color) !important;
+            border: none !important;
+            padding: 0.75rem 2rem !important;
+            font-weight: 600 !important;
+            letter-spacing: 0.1em;
+            transition: all 0.2s ease !important;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(100, 100, 100, 0.3);
+        }
+
+        /* Timer Styles */
+        .timer-container {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 1rem 0;
+            gap: 1rem;
+        }
+
+        .circular-timer {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            margin: 1rem auto;
+        }
+
+        .circular-timer svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            transform: rotate(-90deg);
+        }
+
+        .timer-circle {
+            fill: none;
+            stroke: rgba(255, 255, 255, 0.15);
+            stroke-width: 8;
+        }
+
+        .timer-progress {
+            fill: none;
+            stroke: #f0f0f0;
+            stroke-width: 8;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 1s linear;
+            transform-origin: center;
+        }
+
+        .timer-text {
+            position: absolute;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2.5rem;
+            color: var(--text-color);
+            font-weight: 600;
+            margin: 0;
+            line-height: 1;
+            text-align: center;
+            width: 100%;
+        }
+
+        .pour-volume {
+            position: absolute;
+            top: 60%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.1rem;
+            color: var(--text-color);
+            opacity: 0.8;
+            margin: 0;
+            line-height: 1;
+            text-align: center;
+            width: 100%;
+        }
+
+        .timer-controls {
+            margin-top: 1rem;
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        /* Add table styles */
+        .recipe-table {
+            width: 100%;
+            color: var(--text-color);
+            border-collapse: collapse;
+            min-width: auto; /* Remove fixed min-width */
+            table-layout: fixed; /* Add fixed table layout */
+        }
+
+        .recipe-table th,
+        .recipe-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+            word-wrap: break-word; /* Allow text to wrap */
+            overflow-wrap: break-word;
+        }
+
+        /* Add column widths */
+        .recipe-table th:nth-child(1),
+        .recipe-table td:nth-child(1) {
+            width: 25%;
+        }
+
+        .recipe-table th:nth-child(2),
+        .recipe-table td:nth-child(2) {
+            width: 25%;
+        }
+
+        .recipe-table th:nth-child(3),
+        .recipe-table td:nth-child(3) {
+            width: 25%;
+        }
+
+        .recipe-table th:nth-child(4),
+        .recipe-table td:nth-child(4) {
+            width: 25%;
+        }
+
+        /* Update form table styles */
+        #recipe-form .recipe-table input {
+            width: 100%;
+            max-width: 100px;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .dashboard-panel {
+                padding: 1rem;
+            }
+
+            .recipe-table th,
+            .recipe-table td {
+                padding: 0.5rem;
+                font-size: 0.9rem;
+            }
+        }
+
+        .recipe-table .total-row {
+            border-top: 2px solid var(--border-color);
+        }
+
+        .recipe-table .total-row td {
+            padding-top: 1rem;
+        }
+
+        .stage-name {
+            font-size: 1.2rem;
+            margin: 0;
+            color: var(--text-color);
+        }
+
+        .recipe-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            padding: 1rem;
+        }
+
+        .recipe-card h3 {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            color: var(--text-color);
+        }
+
+        .recipe-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .recipe-header .btn {
+            padding: 0.5rem 1rem !important;
+        }
+
+        #recipe-form {
+            padding-top: 0.5rem;
+        }
+
+        #recipe-form > .mb-3:first-child {
+            margin-top: 0;
+            margin-bottom: 1rem;
+        }
+
+        /* Add these styles to your existing CSS */
+        .btn {
+            white-space: nowrap;
+            min-width: fit-content;
+        }
+
+        #recipe-name {
+            flex: 1;
+        }
+
+        .btn-danger {
+            background-color: #dc3545 !important;
+            padding: 0.75rem !important;
+        }
+
+        .btn-danger:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .recipe-select {
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-sm">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Pour Over Timer</a>
+        </div>
+    </nav>
+
+    <!-- Dashboard Layout -->
+    <div class="dashboard">
+        <!-- Left Panel (Timer) -->
+        <div class="dashboard-panel">
+            <h2 class="section-title">Timer</h2>
+            <div class="timer-container">
+                <h3 class="stage-name" id="current-stage">Choose a recipe to start</h3>
+                <div class="circular-timer">
+                    <svg viewBox="0 0 200 200">
+                        <circle class="timer-circle" cx="100" cy="100" r="90"/>
+                        <circle class="timer-progress" cx="100" cy="100" r="90"/>
+                    </svg>
+                    <div class="timer-text" id="countdown-timer">00:00</div>
+                    <div class="pour-volume" id="current-volume">Pour to --ml</div>
+                </div>
+                <div class="timer-controls">
+                    <button id="timer-control" class="timer-btn">Start</button>
+                    <button id="timer-reset" class="timer-btn">Reset</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Panel -->
+        <div class="dashboard-panel">
+            <!-- Saved Recipes Section -->
+            <div class="mb-5">
+                <h2 class="section-title">Recipe library</h2>
+                <div class="recipe-card">
+                    <div class="recipe-header mb-4">
+                        <div class="d-flex gap-3 w-100">
+                            <select class="form-select recipe-select" id="recipe-selector" onchange="handleRecipeSelection()">
+                                <option value="">Select a recipe</option>
+                                <option value="light-roast">Light roast</option>
+                            </select>
+                            <button id="delete-recipe" class="btn btn-danger" onclick="deleteRecipe()" disabled>
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="recipe-details">
+                        <!-- Recipe details will be loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Create Recipe Section -->
+            <div>
+                <h2 class="section-title">Create your own recipe</h2>
+                <form id="recipe-form">
+                    <div class="mb-3 d-flex align-items-center gap-3">
+                        <input type="text" class="form-control" id="recipe-name" placeholder="Enter recipe name here" required>
+                        <button type="submit" class="btn">Save recipe</button>
+                    </div>
+                    <div class="mb-3">
+                        <table class="recipe-table">
+                            <thead>
+                                <tr>
+                                    <th>Stage</th>
+                                    <th>Duration (sec)</th>
+                                    <th>Pour to (ml)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Bloom</td>
+                                    <td><input type="number" class="form-control stage-time" min="0" value="15"></td>
+                                    <td><input type="number" class="form-control stage-volume" min="0" value="45"></td>
+                                </tr>
+                                <tr>
+                                    <td>Wait</td>
+                                    <td><input type="number" class="form-control stage-time" min="0" value="35"></td>
+                                    <td>-</td>
+                                </tr>
+                                <tr>
+                                    <td>1st Pour</td>
+                                    <td><input type="number" class="form-control stage-time" min="0" value="35"></td>
+                                    <td><input type="number" class="form-control stage-volume" min="0" value="200"></td>
+                                </tr>
+                                <tr>
+                                    <td>Wait</td>
+                                    <td><input type="number" class="form-control stage-time" min="0" value="15"></td>
+                                    <td>-</td>
+                                </tr>
+                                <tr>
+                                    <td>2nd Pour</td>
+                                    <td><input type="number" class="form-control stage-time" min="0" value="45"></td>
+                                    <td><input type="number" class="form-control stage-volume" min="0" value="300"></td>
+                                </tr>
+                                <tr>
+                                    <td>Wait</td>
+                                    <td><input type="number" class="form-control stage-time" min="0" value="25"></td>
+                                    <td>-</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; <script>document.write(new Date().getFullYear())</script> Pour Over Timer. All rights reserved.</p>
+    </footer>
+
+    <!-- Add Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Add custom JavaScript -->
+    <script>
+        const API_BASE_URL = window.location.hostname === 'localhost' 
+            ? 'http://localhost:8000/api' 
+            : `${window.location.protocol}//${window.location.hostname}/api`;
+
+        // Update fetchWithRetry function with better CORS and error handling
+        async function fetchWithRetry(url, options, retries = 3) {
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), 15000);
+
+            try {
+                console.log(`Attempting to fetch ${url}`, {
+                    method: options?.method || 'GET',
+                    headers: options?.headers
+                });
+
+                const response = await fetch(url, {
+                    ...options,
+                    signal: controller.signal,
+                    headers: {
+                        ...options?.headers,
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    credentials: 'same-origin',  // Changed from 'include' to 'same-origin'
+                    mode: 'cors'
+                });
+                clearTimeout(timeout);
+                
+                // Log response details for debugging
+                console.log(`Response status: ${response.status}`);
+                console.log(`Response headers:`, Object.fromEntries([...response.headers]));
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error(`Server error response: ${errorText}`);
+                    throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+                }
+                
+                const contentType = response.headers.get('content-type');
+                console.log(`Content-Type: ${contentType}`);
+                
+                if (!contentType || !contentType.includes('application/json')) {
+                    console.error(`Invalid content type: ${contentType}`);
+                    throw new Error(`Expected JSON but got ${contentType}`);
+                }
+
+                return response;
+            } catch (error) {
+                clearTimeout(timeout);
+                console.error('Fetch error details:', {
+                    message: error.message,
+                    name: error.name,
+                    stack: error.stack
+                });
+                
+                if (error.name === 'AbortError') {
+                    throw new Error('Request timed out. Please check your connection.');
+                }
+                
+                if (retries > 0) {
+                    console.log(`Retrying... ${retries} attempts left`);
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+                    return fetchWithRetry(url, options, retries - 1);
+                }
+                throw error;
+            } finally {
+                clearTimeout(timeout);
+            }
+        }
+
+        // Add this function to load initial recipes
+        async function loadInitialRecipes() {
+            try {
+                console.log('Fetching recipes from:', `${API_BASE_URL}/recipes`);
+                const response = await fetchWithRetry(`${API_BASE_URL}/recipes`);
+                const recipes_data = await response.json();
+                
+                console.log('Received recipes:', recipes_data);
+                
+                // Clear existing recipes except light-roast
+                const selector = document.getElementById('recipe-selector');
+                Array.from(selector.options)
+                    .filter(option => option.value !== 'light-roast' && option.value !== '')
+                    .forEach(option => option.remove());
+                
+                // Add fetched recipes
+                recipes_data.forEach(recipe => {
+                    try {
+                        const recipeId = `recipe-${recipe.id}`;
+                        const stages = JSON.parse(recipe.stages);
+                        
+                        recipes[recipeId] = {
+                            name: recipe.name,
+                            stages: stages,
+                            totalTime: calculateTotalTime(stages),
+                            totalPourTo: calculateTotalVolume(stages)
+                        };
+                        
+                        const option = document.createElement('option');
+                        option.value = recipeId;
+                        option.textContent = recipe.name;
+                        selector.appendChild(option);
+                    } catch (parseError) {
+                        console.error('Error parsing recipe:', recipe, parseError);
+                    }
+                });
+                
+                console.log('Recipes loaded successfully');
+            } catch (error) {
+                console.error('Error loading recipes:', error);
+                // Don't show alert, just log the error
+                console.warn('Failed to load recipes. Using default recipe only.');
+            }
+        }
+
+        // Call loadInitialRecipes when the page loads
+        document.addEventListener('DOMContentLoaded', loadInitialRecipes);
+
+        // Initialize DOM elements
+        const countdownTimer = document.getElementById('countdown-timer');
+        const currentStage = document.getElementById('current-stage');
+        const timerProgress = document.querySelector('.timer-progress');
+        const timerControl = document.getElementById('timer-control');
+        const timerReset = document.getElementById('timer-reset');
+
+        // Recipe data and state
+        const lightRoastRecipe = {
+            name: 'Light Roast',
+            stages: [
+                { name: 'Bloom', time: 15, volume: 45 },
+                { name: 'Wait', time: 35, volume: null },
+                { name: '1st Pour', time: 35, volume: 200 },
+                { name: 'Wait', time: 15, volume: null },
+                { name: '2nd Pour', time: 45, volume: 300 },
+                { name: 'Wait', time: 25, volume: null }
+            ],
+            totalTime: '02:50',
+            totalPourTo: 300
+        };
+
+        const recipes = {
+            'light-roast': lightRoastRecipe
+        };
+
+        let currentRecipe = null;
+        let currentStageIndex = 0;
+        let timeLeft = 0;
+        let isTimerRunning = false;
+        let timerInterval;
+
+        // Set up circular progress
+        const circumference = 2 * Math.PI * 90;
+        timerProgress.style.strokeDasharray = circumference;
+        timerProgress.style.strokeDashoffset = circumference;
+
+        // Helper functions
+        /**
+         * Formats time in seconds to MM:SS format
+         * @param {number} seconds - Time in seconds
+         * @returns {string} Formatted time string
+         */
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+        }
+
+        /**
+         * Updates the timer display and progress
+         * @returns {void}
+         */
+        function updateTimer() {
+            if (!currentRecipe) return;
+
+            const stage = currentRecipe.stages[currentStageIndex];
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            countdownTimer.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            
+            // Update pour volume display
+            const volumeText = stage.volume ? `Pour to ${stage.volume}ml` : 'Wait';
+            document.getElementById('current-volume').textContent = volumeText;
+            
+            // Update progress bar with reversed direction
+            const progress = 1 - (timeLeft / stage.time);
+            const offset = circumference * progress;
+            timerProgress.style.strokeDashoffset = offset;
+        }
+
+        // Add these helper functions before the form submission handler
+        function calculateTotalTime(stages) {
+            const totalSeconds = stages.reduce((sum, stage) => sum + stage.time, 0);
+            const minutes = Math.floor(totalSeconds / 60);
+            const seconds = totalSeconds % 60;
+            return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }
+
+        function calculateTotalVolume(stages) {
+            let maxVolume = 0;
+            stages.forEach(stage => {
+                if (stage.volume && stage.volume > maxVolume) {
+                    maxVolume = stage.volume;
+                }
+            });
+            return maxVolume;
+        }
+
+        // Update the displayRecipeDetails function
+        function displayRecipeDetails() {
+            const selector = document.getElementById('recipe-selector');
+            const recipeId = selector.value;
+            const recipeDetails = document.getElementById('recipe-details');
+            
+            if (recipeId && recipes[recipeId]) {
+                const recipe = recipes[recipeId];
+                let totalTime = 0;
+                let cumulativeTime = 0;
+                
+                const rows = recipe.stages.map(stage => {
+                    const stageTiming = formatTime(cumulativeTime);  // Get timing before adding current stage
+                    cumulativeTime += stage.time;  // Add current stage duration to cumulative time
+                    totalTime = cumulativeTime;  // Update total time
+                    
+                    return `
+                        <tr>
+                            <td>${stage.name}</td>
+                            <td>${stageTiming}</td>
+                            <td>${formatTime(stage.time)}</td>
+                            <td>${stage.volume || '-'}</td>
+                        </tr>
+                    `;
+                }).join('');
+
+                recipeDetails.innerHTML = `
+                    <table class="recipe-table">
+                        <thead>
+                            <tr>
+                                <th>Stage</th>
+                                <th>Timing</th>
+                                <th>Duration</th>
+                                <th>Pour to (ml)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${rows}
+                            <tr class="total-row">
+                                <td><strong>Total</strong></td>
+                                <td></td>
+                                <td><strong>${formatTime(totalTime)}</strong></td>
+                                <td><strong>${recipe.totalPourTo}</strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                `;
+            } else {
+                recipeDetails.innerHTML = '';
+            }
+        }
+
+        // Add try-catch blocks for error handling
+        function handleRecipeSelection() {
+            try {
+                const selector = document.getElementById('recipe-selector');
+                const deleteBtn = document.getElementById('delete-recipe');
+                const recipeId = selector.value;
+                
+                // Enable delete button for all recipes except light-roast and empty selection
+                deleteBtn.disabled = !recipeId || recipeId === 'light-roast';
+                
+                displayRecipeDetails();
+                loadSelectedRecipe();
+            } catch (error) {
+                console.error('Error loading recipe:', error.message);
+                alert('Unable to load recipe. Please try again.');
+            }
+        }
+
+        function loadSelectedRecipe() {
+            const selector = document.getElementById('recipe-selector');
+            const recipeId = selector.value;
+            
+            if (recipeId && recipes[recipeId]) {
+                currentRecipe = recipes[recipeId];
+                currentStageIndex = 0;
+                timeLeft = currentRecipe.stages[0].time;
+                currentStage.textContent = currentRecipe.stages[0].name;
+                updateTimer();
+                timerControl.textContent = 'Start';
+                isTimerRunning = false;
+            }
+        }
+
+        function findRecipeIdByName(recipeName) {
+            const foundRecipe = Object.entries(recipes).find(([id, recipe]) => 
+                recipe.name.toLowerCase() === recipeName.toLowerCase()
+            );
+            return foundRecipe ? foundRecipe[0] : null;
+        }
+
+        async function deleteRecipe() {
+            const selector = document.getElementById('recipe-selector');
+            const recipeId = selector.value;
+            
+            if (recipeId === 'light-roast') {
+                alert('Cannot delete the default recipe');
+                return;
+            }
+
+            if (recipeId && recipes[recipeId]) {
+                if (confirm(`Are you sure you want to delete "${recipes[recipeId].name}"?`)) {
+                    try {
+                        const response = await fetchWithRetry(
+                            `${API_BASE_URL}/recipes/${recipeId.split('-')[1]}`,
+                            {
+                                method: 'DELETE',
+                                headers: {
+                                    'Accept': 'application/json'
+                                },
+                                credentials: 'include'
+                            }
+                        );
+
+                        if (!response.ok) {
+                            throw new Error('Failed to delete recipe');
+                        }
+
+                        // Remove from frontend
+                        delete recipes[recipeId];
+                        selector.querySelector(`option[value="${recipeId}"]`).remove();
+                        selector.value = '';
+                        document.getElementById('recipe-details').innerHTML = '';
+                        document.getElementById('delete-recipe').disabled = true;
+                        
+                        // Reset timer if the deleted recipe was selected
+                        if (currentRecipe && currentRecipe.name === recipes[recipeId]?.name) {
+                            timerReset.click();
+                            currentRecipe = null;
+                        }
+                    } catch (error) {
+                        console.error('Error:', error);
+                        alert(`Failed to delete recipe: ${error.message}`);
+                    }
+                }
+            }
+        }
+
+        // Update form submission handler with overwrite support
+        document.getElementById('recipe-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const recipeName = document.getElementById('recipe-name').value.trim();
+            
+            if (recipeName) {
+                // Check if recipe exists
+                const existingRecipeId = findRecipeIdByName(recipeName);
+                
+                if (existingRecipeId === 'light-roast') {
+                    alert('Cannot modify the default recipe');
+                    return;
+                }
+
+                // If recipe exists (except light-roast), ask for confirmation
+                if (existingRecipeId && !confirm(`Recipe "${recipeName}" already exists. Do you want to overwrite it?`)) {
+                    return;
+                }
+
+                // Create stages array from form inputs
+                const stages = [];
+                const timeInputs = document.querySelectorAll('.stage-time');
+                const volumeInputs = document.querySelectorAll('.stage-volume');
+                const stageNames = ['Bloom', 'Wait', '1st Pour', 'Wait', '2nd Pour', 'Wait'];
+                
+                for (let i = 0; i < timeInputs.length; i++) {
+                    stages.push({
+                        name: stageNames[i],
+                        time: parseInt(timeInputs[i].value) || 0,
+                        volume: i % 2 === 0 ? parseInt(volumeInputs[Math.floor(i/2)].value) || 0 : null
+                    });
+                }
+
+                const recipeData = {
+                    name: recipeName,
+                    stages: stages
+                };
+
+                try {
+                    const method = existingRecipeId ? 'PUT' : 'POST';
+                    const url = existingRecipeId 
+                        ? `${API_BASE_URL}/recipes/${existingRecipeId.split('-')[1]}`
+                        : `${API_BASE_URL}/recipes`;
+
+                    const response = await fetchWithRetry(url, {
+                        method: method,
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        },
+                        credentials: 'same-origin',
+                        body: JSON.stringify(recipeData)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`Failed to ${existingRecipeId ? 'update' : 'save'} recipe`);
+                    }
+
+                    const data = await response.json();
+                    
+                    // Update recipes object
+                    const recipeId = existingRecipeId || `recipe-${data.id}`;
+                    recipes[recipeId] = {
+                        name: recipeName,
+                        stages: stages,
+                        totalTime: calculateTotalTime(stages),
+                        totalPourTo: calculateTotalVolume(stages)
+                    };
+
+                    // Update selector without creating duplicate options
+                    if (!existingRecipeId) {
+                        // Add new option if it's a new recipe
+                        updateRecipeSelector(recipeId, recipeName);
+                    } else {
+                        // Update existing option and select it
+                        const selector = document.getElementById('recipe-selector');
+                        selector.value = recipeId;
+                        handleRecipeSelection();
+                    }
+                    
+                    // Reset form and show success message
+                    e.target.reset();
+                    alert(`Recipe ${existingRecipeId ? 'updated' : 'saved'} successfully!`);
+                    
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert(error.message);
+                }
+            } else {
+                alert('Please enter a recipe name');
+            }
+        });
+
+        function updateRecipeSelector(recipeId, recipeName) {
+            const selector = document.getElementById('recipe-selector');
+            const option = document.createElement('option');
+            option.value = recipeId;
+            option.textContent = recipeName;
+            selector.appendChild(option);
+            selector.value = recipeId;
+            handleRecipeSelection();
+        }
+
+        // Timer control functionality
+        timerControl.addEventListener('click', () => {
+            if (!currentRecipe) {
+                alert('Please select a recipe first');
+                return;
+            }
+
+            if (!isTimerRunning) {
+                // Start timer
+                timerControl.textContent = 'Pause';
+                timerInterval = setInterval(() => {
+                    if (timeLeft > 0) {
+                        timeLeft--;
+                        updateTimer();
+                    } else if (currentStageIndex < currentRecipe.stages.length - 1) {
+                        // Move to next stage
+                        currentStageIndex++;
+                        timeLeft = currentRecipe.stages[currentStageIndex].time;
+                        currentStage.textContent = currentRecipe.stages[currentStageIndex].name;
+                        updateTimer();
+                    } else {
+                        // Recipe complete
+                        clearInterval(timerInterval);
+                        timerControl.textContent = 'Start';
+                        isTimerRunning = false;
+                        currentStage.textContent = 'Complete';
+                    }
+                }, 1000);
+            } else {
+                // Pause timer
+                clearInterval(timerInterval);
+                timerControl.textContent = 'Start';
+            }
+            isTimerRunning = !isTimerRunning;
+        });
+
+        // Reset button functionality
+        timerReset.addEventListener('click', () => {
+            clearInterval(timerInterval);
+            if (currentRecipe) {
+                currentStageIndex = 0;
+                timeLeft = currentRecipe.stages[0].time;
+                currentStage.textContent = currentRecipe.stages[0].name;
+                updateTimer();
+            } else {
+                timeLeft = 0;
+                currentStage.textContent = 'Choose a recipe to start';
+                countdownTimer.textContent = '00:00';
+                document.getElementById('current-volume').textContent = 'Pour to: -- ml';
+                timerProgress.style.strokeDashoffset = circumference;
+            }
+            timerControl.textContent = 'Start';
+            isTimerRunning = false;
+        });
+    </script>
+</body>
+</html>
