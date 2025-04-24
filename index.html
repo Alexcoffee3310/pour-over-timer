@@ -491,9 +491,12 @@
             const timeout = setTimeout(() => controller.abort(), 15000);
 
             try {
-                console.log(`Attempting to fetch ${url}`, {
+                // Add detailed request logging
+                console.log('Request details:', {
+                    url: url,
                     method: options?.method || 'GET',
-                    headers: options?.headers
+                    headers: options?.headers,
+                    body: options?.body ? JSON.parse(options.body) : undefined
                 });
 
                 const response = await fetch(url, {
@@ -505,21 +508,29 @@
                         'Content-Type': 'application/json',
                         'X-Requested-With': 'XMLHttpRequest'
                     },
-                    credentials: 'same-origin',  // Changed from 'include' to 'same-origin'
+                    credentials: 'same-origin',
                     mode: 'cors'
                 });
                 clearTimeout(timeout);
                 
-                // Log response details for debugging
-                console.log(`Response status: ${response.status}`);
-                console.log(`Response headers:`, Object.fromEntries([...response.headers]));
-                
+                // Add detailed response logging
+                console.log('Response details:', {
+                    status: response.status,
+                    statusText: response.statusText,
+                    headers: Object.fromEntries([...response.headers]),
+                    url: response.url
+                });
+
                 if (!response.ok) {
                     const errorText = await response.text();
-                    console.error(`Server error response: ${errorText}`);
+                    console.error('Server error details:', {
+                        status: response.status,
+                        statusText: response.statusText,
+                        body: errorText
+                    });
                     throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
                 }
-                
+
                 const contentType = response.headers.get('content-type');
                 console.log(`Content-Type: ${contentType}`);
                 
