@@ -479,99 +479,66 @@
 
     <!-- Add Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Replace API interactions with localStorage -->
+    <script>
+        const storage = {
+            getRecipes() {
+                try {
+                    const stored = localStorage.getItem('recipes');
+                    return stored ? JSON.parse(stored) : [];
+                } catch (error) {
+                    console.error('Error reading from localStorage:', error);
+                    return [];
+                }
+            },
+
+            saveRecipe(recipe) {
+                try {
+                    const recipes = this.getRecipes();
+                    recipe.id = Date.now().toString();
+                    recipes.push(recipe);
+                    localStorage.setItem('recipes', JSON.stringify(recipes));
+                    return recipe;
+                } catch (error) {
+                    console.error('Error saving to localStorage:', error);
+                    throw new Error('Failed to save recipe');
+                }
+            },
+
+            updateRecipe(id, recipe) {
+                try {
+                    const recipes = this.getRecipes();
+                    const index = recipes.findIndex(r => r.id === id);
+                    if (index !== -1) {
+                        recipes[index] = { ...recipe, id };
+                        localStorage.setItem('recipes', JSON.stringify(recipes));
+                    }
+                    return recipe;
+                } catch (error) {
+                    console.error('Error updating localStorage:', error);
+                    throw new Error('Failed to update recipe');
+                }
+            },
+
+            deleteRecipe(id) {
+                try {
+                    const recipes = this.getRecipes();
+                    const filtered = recipes.filter(r => r.id !== id);
+                    localStorage.setItem('recipes', JSON.stringify(filtered));
+                } catch (error) {
+                    console.error('Error deleting from localStorage:', error);
+                    throw new Error('Failed to delete recipe');
+                }
+            }
+        };
+    </script>
     <!-- Add custom JavaScript -->
     <script>
-        const API_BASE_URL = window.location.hostname === 'localhost' 
-            ? 'http://localhost:8000/api' 
-            : `${window.location.protocol}//${window.location.hostname}/api`;
-
-        // Update fetchWithRetry function with enhanced logging
-        async function fetchWithRetry(url, options, retries = 3) {
-            const controller = new AbortController();
-            const timeout = setTimeout(() => controller.abort(), 15000);
-
-            try {
-                // Enhanced request logging with full details
-                console.log('📤 Request Details:', {
-                    url: url,
-                    method: options?.method || 'GET',
-                    headers: options?.headers,
-                    body: options?.body ? JSON.parse(options.body) : undefined,
-                    retries_left: retries,
-                    full_options: options // Log complete options object
-                });
-
-                const response = await fetch(url, {
-                    ...options,
-                    signal: controller.signal,
-                    headers: {
-                        ...options?.headers,
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest'
-                    },
-                    credentials: 'include', // Changed from 'same-origin' to 'include'
-                    mode: 'cors'
-                });
-                clearTimeout(timeout);
-                
-                // Enhanced response logging
-                console.log('📥 Response received:', {
-                    status: response.status,
-                    statusText: response.statusText,
-                    headers: Object.fromEntries([...response.headers]),
-                    url: response.url
-                });
-
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    console.error('🚫 Server error:', {
-                        status: response.status,
-                        statusText: response.statusText,
-                        body: errorText,
-                        raw_response: response
-                    });
-                    throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
-                }
-
-                const contentType = response.headers.get('content-type');
-                console.log(`Content-Type: ${contentType}`);
-                
-                if (!contentType || !contentType.includes('application/json')) {
-                    console.error(`Invalid content type: ${contentType}`);
-                    throw new Error(`Expected JSON but got ${contentType}`);
-                }
-
-                return response;
-            } catch (error) {
-                clearTimeout(timeout);
-                console.error('Fetch error details:', {
-                    message: error.message,
-                    name: error.name,
-                    stack: error.stack
-                });
-                
-                if (error.name === 'AbortError') {
-                    throw new Error('Request timed out. Please check your connection.');
-                }
-                
-                if (retries > 0) {
-                    console.log(`Retrying... ${retries} attempts left`);
-                    await new Promise(resolve => setTimeout(resolve, 2000));
-                    return fetchWithRetry(url, options, retries - 1);
-                }
-                throw error;
-            } finally {
-                clearTimeout(timeout);
-            }
-        }
-
         // Add this function to load initial recipes
         async function loadInitialRecipes() {
             try {
-                console.log('Fetching recipes from:', `${API_BASE_URL}/recipes`);
-                const response = await fetchWithRetry(`${API_BASE_URL}/recipes`);
-                const recipes_data = await response.json();
+                console.log('Fetching recipes from localStorage');
+                const recipes_data = storage.getRecipes();
                 
                 console.log('Received recipes:', recipes_data);
                 
@@ -585,7 +552,7 @@
                 recipes_data.forEach(recipe => {
                     try {
                         const recipeId = `recipe-${recipe.id}`;
-                        const stages = JSON.parse(recipe.stages);
+                        const stages = recipe.stages;
                         
                         recipes[recipeId] = {
                             name: recipe.name,
@@ -807,20 +774,7 @@
             if (recipeId && recipes[recipeId]) {
                 if (confirm(`Are you sure you want to delete "${recipes[recipeId].name}"?`)) {
                     try {
-                        const response = await fetchWithRetry(
-                            `${API_BASE_URL}/recipes/${recipeId.split('-')[1]}`,
-                            {
-                                method: 'DELETE',
-                                headers: {
-                                    'Accept': 'application/json'
-                                },
-                                credentials: 'include'
-                            }
-                        );
-
-                        if (!response.ok) {
-                            throw new Error('Failed to delete recipe');
-                        }
+                        storage.deleteRecipe(recipeId.split('-')[1]);
 
                         // Remove from frontend
                         delete recipes[recipeId];
@@ -891,30 +845,18 @@
                 }
 
                 try {
-                    const method = existingRecipeId ? 'PUT' : 'POST';
-                    const url = existingRecipeId 
-                        ? `${API_BASE_URL}/recipes/${existingRecipeId.split('-')[1]}`
-                        : `${API_BASE_URL}/recipes`;
+                    const recipeId = existingRecipeId ? existingRecipeId.split('-')[1] : null;
 
-                    const response = await fetchWithRetry(url, {
-                        method: method,
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/json'
-                        },
-                        credentials: 'same-origin',
-                        body: JSON.stringify(recipeData)
-                    });
-
-                    if (!response.ok) {
-                        throw new Error(`Failed to ${existingRecipeId ? 'update' : 'save'} recipe`);
+                    if (recipeId) {
+                        storage.updateRecipe(recipeId, recipeData);
+                    } else {
+                        const savedRecipe = storage.saveRecipe(recipeData);
+                        recipeData.id = savedRecipe.id;
                     }
 
-                    const data = await response.json();
-                    
                     // Update recipes object
-                    const recipeId = existingRecipeId || `recipe-${data.id}`;
-                    recipes[recipeId] = {
+                    const newRecipeId = existingRecipeId || `recipe-${recipeData.id}`;
+                    recipes[newRecipeId] = {
                         name: recipeName,
                         stages: stages,
                         totalTime: calculateTotalTime(stages),
@@ -924,11 +866,11 @@
                     // Update selector without creating duplicate options
                     if (!existingRecipeId) {
                         // Add new option if it's a new recipe
-                        updateRecipeSelector(recipeId, recipeName);
+                        updateRecipeSelector(newRecipeId, recipeName);
                     } else {
                         // Update existing option and select it
                         const selector = document.getElementById('recipe-selector');
-                        selector.value = recipeId;
+                        selector.value = newRecipeId;
                         handleRecipeSelection();
                     }
                     
