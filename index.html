@@ -848,19 +848,6 @@
             const recipeName = document.getElementById('recipe-name').value.trim();
             
             if (recipeName) {
-                // Check if recipe exists
-                const existingRecipeId = findRecipeIdByName(recipeName);
-                
-                if (existingRecipeId === 'light-roast') {
-                    alert('Cannot modify the default recipe');
-                    return;
-                }
-
-                // If recipe exists (except light-roast), ask for confirmation
-                if (existingRecipeId && !confirm(`Recipe "${recipeName}" already exists. Do you want to overwrite it?`)) {
-                    return;
-                }
-
                 // Create stages array from form inputs
                 const stages = [];
                 const timeInputs = document.querySelectorAll('.stage-time');
@@ -879,6 +866,29 @@
                     name: recipeName,
                     stages: stages
                 };
+
+                // Add validation logging
+                console.log('Validating recipe data:', {
+                    recipeData,
+                    validations: {
+                        hasName: Boolean(recipeName),
+                        stagesLength: stages.length,
+                        stagesValid: stages.every(s => s.name && typeof s.time === 'number')
+                    }
+                });
+
+                // Check if recipe exists
+                const existingRecipeId = findRecipeIdByName(recipeName);
+                
+                if (existingRecipeId === 'light-roast') {
+                    alert('Cannot modify the default recipe');
+                    return;
+                }
+
+                // If recipe exists (except light-roast), ask for confirmation
+                if (existingRecipeId && !confirm(`Recipe "${recipeName}" already exists. Do you want to overwrite it?`)) {
+                    return;
+                }
 
                 try {
                     const method = existingRecipeId ? 'PUT' : 'POST';
