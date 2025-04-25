@@ -491,13 +491,14 @@
             const timeout = setTimeout(() => controller.abort(), 15000);
 
             try {
-                // Enhanced request logging
-                console.log('📤 Making request:', {
+                // Enhanced request logging with full details
+                console.log('📤 Request Details:', {
                     url: url,
                     method: options?.method || 'GET',
                     headers: options?.headers,
                     body: options?.body ? JSON.parse(options.body) : undefined,
-                    retries_left: retries
+                    retries_left: retries,
+                    full_options: options // Log complete options object
                 });
 
                 const response = await fetch(url, {
@@ -509,7 +510,7 @@
                         'Content-Type': 'application/json',
                         'X-Requested-With': 'XMLHttpRequest'
                     },
-                    credentials: 'same-origin',
+                    credentials: 'include', // Changed from 'same-origin' to 'include'
                     mode: 'cors'
                 });
                 clearTimeout(timeout);
