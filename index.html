@@ -485,18 +485,19 @@
             ? 'http://localhost:8000/api' 
             : `${window.location.protocol}//${window.location.hostname}/api`;
 
-        // Update fetchWithRetry function with better CORS and error handling
+        // Update fetchWithRetry function with enhanced logging
         async function fetchWithRetry(url, options, retries = 3) {
             const controller = new AbortController();
             const timeout = setTimeout(() => controller.abort(), 15000);
 
             try {
-                // Add detailed request logging
-                console.log('Request details:', {
+                // Enhanced request logging
+                console.log('📤 Making request:', {
                     url: url,
                     method: options?.method || 'GET',
                     headers: options?.headers,
-                    body: options?.body ? JSON.parse(options.body) : undefined
+                    body: options?.body ? JSON.parse(options.body) : undefined,
+                    retries_left: retries
                 });
 
                 const response = await fetch(url, {
@@ -513,8 +514,8 @@
                 });
                 clearTimeout(timeout);
                 
-                // Add detailed response logging
-                console.log('Response details:', {
+                // Enhanced response logging
+                console.log('📥 Response received:', {
                     status: response.status,
                     statusText: response.statusText,
                     headers: Object.fromEntries([...response.headers]),
@@ -523,10 +524,11 @@
 
                 if (!response.ok) {
                     const errorText = await response.text();
-                    console.error('Server error details:', {
+                    console.error('🚫 Server error:', {
                         status: response.status,
                         statusText: response.statusText,
-                        body: errorText
+                        body: errorText,
+                        raw_response: response
                     });
                     throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
                 }
